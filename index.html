@@ -1438,13 +1438,13 @@ function renderProjectDescription(project, myRole){
   } else if(req){
     wrap.appendChild(el(`<div class="timer-note" style="margin-bottom:8px">Shared brief from the client — the same description every consultant they're comparing sees.</div>`));
     wrap.appendChild(el(`<div class="note-box" style="white-space:pre-wrap;line-height:1.6;">${escapeHtml(description || 'No description was provided.')}</div>`));
-  } else {
-    wrap.appendChild(el(`<div class="note-box" style="white-space:pre-wrap;line-height:1.6;">${escapeHtml(description || 'No description was provided.')}</div>`));
     if(req.documentName){
       const dlBtn = el(`<button class="btn btn-ghost" style="margin-top:10px;">📎 Download ${escapeHtml(req.documentName)}</button>`);
       dlBtn.onclick = ()=> downloadDataUrl(req.documentName, req.documentType||'application/octet-stream', req.documentData);
       wrap.appendChild(dlBtn);
     }
+  } else {
+    wrap.appendChild(el(`<div class="note-box" style="white-space:pre-wrap;line-height:1.6;">${escapeHtml(description || 'No description was provided.')}</div>`));
   }
   return wrap;
 }
@@ -1457,15 +1457,54 @@ function renderRequestView(request){
 
   wrap.appendChild(renderSharedDescriptionEditor(request));
 
-  const grid = el('<div style="display:flex;flex-direction:column;gap:16px;margin-top:20px;"></div>');
   const sortedMatches = [...request.matches].sort((a,b)=>a.rank-b.rank);
-  const nextIsFree = request.projectIds.length === 0; // true until the first unlock happens, matches server logic exactly
-  sortedMatches.forEach(m=>{
-    const proj = state.projects.find(p=>p.requestId===request.id && p.professional===m.professionalId);
-    grid.appendChild(renderMatchCard(request, m, nextIsFree, proj));
-  });
-  wrap.appendChild(grid);
+  const findProj = (m)=> state.projects.find(p=>p.requestId===request.id && p.professional===m.professionalId);
+
+  // Which match is "active" (shown large, in the center): keep whatever the
+  // client last picked if it's still a valid match; otherwise default to
+  // the most recently unlocked thread, or the top match if none unlocked yet.
+  if(!request.activeMatchId || !sortedMatches.some(m=>m.professionalId===request.activeMatchId)){
+    const unlockedInOrder = sortedMatches.filter(m=>findProj(m));
+    request.activeMatchId = unlockedInOrder.length ? unlockedInOrder[unlockedInOrder.length-1].professionalId : (sortedMatches[0]?.professionalId || null);
+  }
+
+  const layout = el('<div style="display:flex;gap:20px;align-items:flex-start;margin-top:20px;flex-wrap:wrap;"></div>');
+  const centerCol = el('<div style="flex:2 1 380px;min-width:320px;"></div>');
+  const rightCol = el('<div style="flex:1 1 220px;min-width:220px;display:flex;flex-direction:column;gap:10px;"></div>');
+
+  const activeMatch = sortedMatches.find(m=>m.professionalId===request.activeMatchId);
+  if(activeMatch){
+    centerCol.appendChild(renderMatchCard(request, activeMatch, findProj(activeMatch)));
+  }
+
+  const others = sortedMatches.filter(m=>m.professionalId!==request.activeMatchId);
+  if(others.length>0){
+    rightCol.appendChild(el(`<div class="sidebar-section-label">Other matches</div>`));
+    others.forEach(m=>{
+      rightCol.appendChild(renderCompactMatchCard(request, m, findProj(m)));
+    });
+  }
+
+  layout.appendChild(centerCol);
+  if(others.length>0) layout.appendChild(rightCol);
+  wrap.appendChild(layout);
   return wrap;
+}
+
+function renderCompactMatchCard(request, match, proj){
+  const pro = getUser(match.professionalId);
+  const statusText = !proj ? 'Not unlocked yet'
+    : proj.responseStatus==='pending' ? `Awaiting response · ${timeLeftLabel(proj.responseDeadline)}`
+    : proj.responseStatus==='rejected' ? 'Declined'
+    : proj.responseStatus==='expired' ? 'Expired'
+    : 'Active';
+  const lastMsg = proj && proj.messages.length ? proj.messages[proj.messages.length-1] : null;
+  const card = el(`<div class="project-item" style="cursor:pointer;">
+    <div class="project-item-title" style="color:var(--text-ink);">${escapeHtml(pro.name)} <span style="font-weight:400;color:var(--text-muted-light);font-size:11px;">· ${match.score}/100</span></div>
+    <div class="project-item-meta">${statusText}${lastMsg ? ' · "'+escapeHtml(lastMsg.text.slice(0,40))+(lastMsg.text.length>40?'…':'')+'"' : ''}</div>
+  </div>`);
+  card.onclick = ()=>{ request.activeMatchId = match.professionalId; render(); };
+  return card;
 }
 
 function countWords(text){
@@ -1579,7 +1618,7 @@ function renderSharedDescriptionEditor(request){
   return box;
 }
 
-function renderMatchCard(request, match, nextIsFree, proj){
+function renderMatchCard(request, match, proj){
   const pro = getUser(match.professionalId);
   const card = el('<div style="border:1px solid #DDD3BC;border-radius:8px;background:white;overflow:hidden;"></div>');
   const statusPill = !proj ? '' : proj.responseStatus==='pending' ? `<span class="status-pill s-new">Awaiting response</span>`
@@ -1637,20 +1676,16 @@ function renderMatchCard(request, match, nextIsFree, proj){
     const body = el('<div style="padding:18px;text-align:center;"></div>');
     const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:8px 10px;font-size:12px;margin-bottom:10px;text-align:left;"></div>`);
     body.appendChild(errBox);
-    const label = nextIsFree ? 'Click for Quotation — Free' : 'Click for Quotation — ₹99';
-    const btn = el(`<button class="btn btn-stamp">${label}</button>`);
+    const btn = el(`<button class="btn btn-stamp">Click for Quotation</button>`);
     btn.onclick = async ()=>{
-      if(!nextIsFree){
-        const ok = confirm(`Unlock a quotation chat with ${pro.name} for a simulated ₹99?`);
-        if(!ok) return;
-      }
       btn.disabled = true; btn.textContent = 'Unlocking…';
       try{
-        await apiUnlockQuotation(request.id, match.professionalId, !nextIsFree);
+        await apiUnlockQuotation(request.id, match.professionalId, false);
         await loadState();
+        request.activeMatchId = match.professionalId;
         render();
       }catch(e){
-        btn.disabled = false; btn.textContent = label;
+        btn.disabled = false; btn.textContent = 'Click for Quotation';
         errBox.textContent = e.message || 'Could not unlock this quotation.';
         errBox.style.display = 'block';
       }
@@ -1683,6 +1718,8 @@ function renderIncomingRequestsView(){
 
   pending.forEach(p=>{
     const client = getUser(p.client);
+    const req = p.requestId ? state.requests[p.requestId] : null;
+    const description = req ? req.description : p.description;
     const card = el(`<div class="ms-card" style="margin-bottom:14px;"></div>`);
     const head = el(`<div class="ms-head" style="cursor:default;">
       <div class="ms-head-left">
@@ -1695,7 +1732,12 @@ function renderIncomingRequestsView(){
     </div>`);
     card.appendChild(head);
     const body = el('<div class="ms-body"></div>');
-    if(p.description) body.appendChild(el(`<div class="ms-desc">${escapeHtml(p.description)}</div>`));
+    if(description) body.appendChild(el(`<div class="ms-desc">${escapeHtml(description)}</div>`));
+    if(req && req.documentName){
+      const dlBtn = el(`<button class="btn btn-ghost" style="margin-bottom:10px;">📎 Download ${escapeHtml(req.documentName)}</button>`);
+      dlBtn.onclick = ()=> downloadDataUrl(req.documentName, req.documentType||'application/octet-stream', req.documentData);
+      body.appendChild(dlBtn);
+    }
     const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:8px 10px;font-size:12px;"></div>`);
     body.appendChild(errBox);
     const actions = el('<div class="ms-actions"></div>');
