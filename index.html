@@ -1814,6 +1814,111 @@ function computeProjectPercent(p){
 const STATUS_PILL_CLASS = { Active:'s-active', New:'s-new', Completed:'s-completed', Disputed:'s-disputed' };
 const RISK_CLASS = { Low:'risk-low', Medium:'risk-medium', High:'risk-high' };
 
+/* ---------- lightweight charts (no external library — hand-built SVG/CSS) ---------- */
+function describeArc(cx, cy, r, startAngle, endAngle){
+  const toXY = (ang)=>{
+    const rad = (ang - 90) * Math.PI/180;
+    return [cx + r*Math.cos(rad), cy + r*Math.sin(rad)];
+  };
+  const [x1,y1] = toXY(startAngle);
+  const [x2,y2] = toXY(endAngle);
+  const largeArc = (endAngle-startAngle) > 180 ? 1 : 0;
+  return `M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z`;
+}
+function renderDonutChart(data, size=132){
+  // data: [{label, value, color}]
+  const total = data.reduce((s,d)=>s+d.value,0);
+  const r = size/2, cx=r, cy=r;
+  let angle = 0;
+  let paths = '';
+  if(total>0){
+    data.forEach(d=>{
+      if(d.value<=0) return;
+      const sweep = d.value/total*360;
+      const start = angle, end = angle+sweep;
+      angle = end;
+      if(sweep>=359.99){
+        paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${d.color}"/>`;
+      } else {
+        paths += `<path d="${describeArc(cx,cy,r,start,end)}" fill="${d.color}"/>`;
+      }
+    });
+  } else {
+    paths = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ECE7FA"/>`;
+  }
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${paths}<circle cx="${cx}" cy="${cy}" r="${r*0.6}" fill="white"/></svg>`;
+}
+function renderChartLegend(data){
+  const wrap = el('<div style="display:flex;flex-direction:column;gap:6px;"></div>');
+  const total = data.reduce((s,d)=>s+d.value,0);
+  data.forEach(d=>{
+    const pct = total>0 ? Math.round(d.value/total*100) : 0;
+    wrap.appendChild(el(`<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;">
+      <span style="width:10px;height:10px;border-radius:3px;background:${d.color};flex-shrink:0;"></span>
+      <span style="color:var(--text-muted-light);flex:1;">${escapeHtml(d.label)}</span>
+      <span style="font-family:var(--mono);font-weight:600;color:var(--text-ink);">${d.value} · ${pct}%</span>
+    </div>`));
+  });
+  return wrap;
+}
+function renderBarChartRows(data){
+  // data: [{label, value}], sorted desc by caller if desired
+  const max = Math.max(...data.map(d=>d.value), 1);
+  const wrap = el('<div></div>');
+  data.forEach(d=>{
+    const row = el(`<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;"></div>`);
+    row.appendChild(el(`<div style="width:78px;font-size:11px;color:var(--text-muted-light);flex-shrink:0;">${escapeHtml(d.label)}</div>`));
+    const track = el(`<div style="flex:1;background:#ECE7FA;border-radius:999px;height:14px;overflow:hidden;"></div>`);
+    track.appendChild(el(`<div style="width:${Math.max(2,d.value/max*100)}%;height:100%;background:var(--gradient-cool);border-radius:999px;"></div>`));
+    row.appendChild(track);
+    row.appendChild(el(`<div style="width:76px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text-ink);flex-shrink:0;">${fmtMoney(d.value)}</div>`));
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
+function renderDashboardCharts(rows){
+  const wrap = el('<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:22px;"></div>');
+
+  // Status distribution (donut)
+  const statusColors = { Active:'#4F46E5', Completed:'#00C896', Disputed:'#DC2626', New:'#D97706' };
+  const statusCounts = {};
+  rows.forEach(r=>{ statusCounts[r.status] = (statusCounts[r.status]||0)+1; });
+  const statusData = Object.keys(statusColors).map(k=>({ label:k, value:statusCounts[k]||0, color:statusColors[k] }));
+  const statusCard = el('<div class="ms-card" style="flex:1 1 260px;min-width:240px;padding:16px;display:flex;gap:16px;align-items:center;"></div>');
+  statusCard.appendChild(el(renderDonutChart(statusData)));
+  const statusLegendWrap = el('<div style="flex:1;"></div>');
+  statusLegendWrap.appendChild(el(`<div style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted-light);font-weight:600;margin-bottom:8px;">Status breakdown</div>`));
+  statusLegendWrap.appendChild(renderChartLegend(statusData));
+  statusCard.appendChild(statusLegendWrap);
+  wrap.appendChild(statusCard);
+
+  // Risk distribution (donut)
+  const riskColors = { Low:'#00C896', Medium:'#D97706', High:'#FF2E88' };
+  const riskCounts = {};
+  rows.forEach(r=>{ riskCounts[r.risk] = (riskCounts[r.risk]||0)+1; });
+  const riskData = Object.keys(riskColors).map(k=>({ label:k, value:riskCounts[k]||0, color:riskColors[k] }));
+  const riskCard = el('<div class="ms-card" style="flex:1 1 260px;min-width:240px;padding:16px;display:flex;gap:16px;align-items:center;"></div>');
+  riskCard.appendChild(el(renderDonutChart(riskData)));
+  const riskLegendWrap = el('<div style="flex:1;"></div>');
+  riskLegendWrap.appendChild(el(`<div style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted-light);font-weight:600;margin-bottom:8px;">Risk breakdown</div>`));
+  riskLegendWrap.appendChild(renderChartLegend(riskData));
+  riskCard.appendChild(riskLegendWrap);
+  wrap.appendChild(riskCard);
+
+  // Contract value by zone (bar)
+  const byZone = {};
+  rows.forEach(r=>{ const z = r.project.zone || 'Unassigned'; byZone[z] = (byZone[z]||0) + r.value; });
+  const zoneData = Object.entries(byZone).map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value).slice(0,6);
+  const zoneCard = el('<div class="ms-card" style="flex:1 1 300px;min-width:260px;padding:16px;"></div>');
+  zoneCard.appendChild(el(`<div style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted-light);font-weight:600;margin-bottom:12px;">Contract value by location</div>`));
+  if(zoneData.length===0) zoneCard.appendChild(el('<div class="timer-note">No projects yet.</div>'));
+  else zoneCard.appendChild(renderBarChartRows(zoneData));
+  wrap.appendChild(zoneCard);
+
+  return wrap;
+}
+
 function renderAdminDashboard(){
   const wrap = el('<div class="panel"></div>');
   const titleRow = el('<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:4px;"></div>');
@@ -1833,6 +1938,9 @@ function renderAdminDashboard(){
   const rows = state.projects.map(p=>({
     project:p, value:computeProjectValue(p), status:deriveProjectStatus(p), risk:deriveProjectRisk(p), pct:computeProjectPercent(p)
   }));
+
+  wrap.appendChild(renderDashboardCharts(rows));
+
   const filtered = dashboardFilter==='active' ? rows.filter(r=>r.status==='Active') : rows;
   filtered.sort((a,b)=> b.value - a.value);
 
