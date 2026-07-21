@@ -1,0 +1,2900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stamped — Work together. Honestly.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141F38;
+  --ink-2:#1B2A4A;
+  --ink-3:#233457;
+  --ink-line:#324570;
+  --parchment:#EDE6D6;
+  --parchment-2:#F4EFE3;
+  --stamp:#B23A2E;
+  --stamp-dark:#8E2C22;
+  --gold:#A9852E;
+  --success:#3F7A5C;
+  --success-bg:#DDEAE1;
+  --warn:#B27A2E;
+  --text-ink:#1B2434;
+  --text-muted-dark:#B9C2D6;
+  --text-muted-light:#6B7280;
+  --radius:3px;
+  --serif:'Fraunces', serif;
+  --sans:'Inter', sans-serif;
+  --mono:'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:var(--sans);background:var(--ink);color:var(--text-muted-dark);}
+::selection{background:var(--stamp);color:white;}
+
+/* ---------- shell ---------- */
+.app{min-height:100vh;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:var(--ink-2);border-bottom:1px solid var(--ink-line);flex-wrap:wrap;gap:12px;}
+.brand{display:flex;align-items:baseline;gap:10px;}
+.brand-mark{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:0.5px;color:var(--parchment-2);}
+.brand-mark span{color:var(--stamp);}
+.brand-tag{font-size:11px;color:var(--text-muted-dark);letter-spacing:0.3px;font-style:italic;font-family:var(--serif);}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.role-switch{display:flex;align-items:center;gap:8px;background:var(--ink);border:1px solid var(--ink-line);border-radius:20px;padding:5px 12px 5px 5px;}
+.account-select{background:transparent;border:none;color:var(--parchment-2);font-family:var(--sans);font-size:12.5px;font-weight:600;cursor:pointer;outline:none;max-width:220px;}
+.account-select option{background:var(--ink-2);color:var(--parchment-2);}
+.role-btn{border:none;background:transparent;color:var(--text-muted-dark);font-family:var(--sans);font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:18px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s;}
+.role-btn.active{background:var(--parchment-2);color:var(--text-ink);}
+.avatar-dot{width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;}
+.tier-pill{font-family:var(--mono);font-size:10.5px;padding:4px 9px;border-radius:12px;border:1px solid var(--ink-line);color:var(--text-muted-dark);text-transform:uppercase;letter-spacing:.5px;}
+.tier-pill.pro{border-color:var(--gold);color:var(--gold);}
+
+.body-wrap{flex:1;display:flex;min-height:0;}
+.sidebar{width:280px;flex-shrink:0;background:var(--ink-2);border-right:1px solid var(--ink-line);display:flex;flex-direction:column;padding:18px 14px;gap:18px;overflow-y:auto;}
+.sidebar-section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted-dark);opacity:.6;padding:0 6px;margin-bottom:8px;font-weight:600;}
+
+.rep-card{background:var(--ink-3);border:1px solid var(--ink-line);border-radius:var(--radius);padding:14px;}
+.rep-card-name{font-family:var(--serif);font-size:16px;color:var(--parchment-2);font-weight:600;}
+.rep-card-role{font-size:11px;color:var(--text-muted-dark);margin-bottom:10px;}
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.badge{font-family:var(--mono);font-size:9.5px;padding:3px 8px;border-radius:10px;background:rgba(169,133,46,.15);border:1px solid var(--gold);color:var(--gold);letter-spacing:.3px;}
+.badge.none{opacity:.4;border-style:dashed;color:var(--text-muted-dark);border-color:var(--ink-line);}
+.rep-score-note{font-size:10.5px;color:var(--text-muted-dark);opacity:.7;margin-top:8px;line-height:1.4;}
+
+.project-list{display:flex;flex-direction:column;gap:6px;}
+.project-item{background:var(--ink-3);border:1px solid var(--ink-line);border-radius:var(--radius);padding:10px 12px;cursor:pointer;transition:.15s;}
+.project-item:hover{border-color:var(--gold);}
+.project-item.active{border-color:var(--stamp);background:var(--ink);}
+.project-item-title{font-size:13px;font-weight:600;color:var(--parchment-2);margin-bottom:3px;}
+.project-item-meta{font-size:10.5px;color:var(--text-muted-dark);font-family:var(--mono);}
+.new-project-btn{width:100%;padding:10px;background:none;border:1px dashed var(--ink-line);color:var(--text-muted-dark);border-radius:var(--radius);cursor:pointer;font-size:12px;font-family:var(--sans);}
+.new-project-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--parchment-2);color:var(--text-ink);}
+.main-header{padding:18px 28px;border-bottom:1px solid #DDD3BC;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;}
+.main-title{font-family:var(--serif);font-size:22px;font-weight:600;}
+.main-sub{font-size:12px;color:var(--text-muted-light);margin-top:3px;font-family:var(--mono);}
+.tabs{display:flex;gap:2px;padding:0 28px;background:var(--parchment-2);border-bottom:1px solid #DDD3BC;}
+.tab{padding:12px 16px;font-size:13px;font-weight:600;color:var(--text-muted-light);cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--stamp);border-bottom-color:var(--stamp);}
+.tab-count{font-family:var(--mono);font-size:10px;background:#DDD3BC;padding:1px 6px;border-radius:8px;margin-left:5px;}
+
+.panel{flex:1;overflow-y:auto;padding:24px 28px 60px;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--text-muted-light);gap:10px;padding:60px 20px;}
+.empty-state h3{font-family:var(--serif);font-size:20px;color:var(--text-ink);font-weight:600;margin:0;}
+
+/* ---------- chat ---------- */
+.chat-scroll{display:flex;flex-direction:column;gap:10px;max-width:720px;margin:0 auto;}
+.msg{max-width:72%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.45;position:relative;}
+.msg.mine{align-self:flex-end;background:var(--ink);color:var(--parchment-2);border-bottom-right-radius:3px;}
+.msg.theirs{align-self:flex-start;background:white;border:1px solid #DDD3BC;border-bottom-left-radius:3px;}
+.msg-meta{font-family:var(--mono);font-size:9.5px;opacity:.55;margin-top:4px;}
+.chat-input-row{max-width:720px;margin:14px auto 0;display:flex;gap:8px;}
+.chat-input{flex:1;padding:12px 14px;border:1px solid #C9BC9A;border-radius:var(--radius);font-family:var(--sans);font-size:14px;background:white;}
+.send-btn{padding:0 20px;background:var(--ink);color:white;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:13px;}
+.send-btn:hover{background:var(--stamp-dark);}
+
+.suggestion-card{max-width:720px;margin:6px auto;background:white;border:1.5px dashed var(--stamp);border-radius:6px;padding:16px 18px;}
+.suggestion-label{font-family:var(--mono);font-size:10px;color:var(--stamp);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.suggestion-label::before{content:'●';animation:pulse 1.4s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.agreement-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;}
+.field{display:flex;flex-direction:column;gap:3px;}
+.field.full{grid-column:1/-1;}
+.field label{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted-light);font-weight:600;}
+.field input,.field textarea{border:1px solid #DDD3BC;border-radius:4px;padding:7px 9px;font-family:var(--sans);font-size:13px;background:var(--parchment-2);}
+.confirm-row{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap;}
+.btn{border:none;border-radius:4px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--sans);letter-spacing:.2px;}
+.btn-stamp{background:var(--stamp);color:white;}
+.btn-stamp:hover{background:var(--stamp-dark);}
+.btn-ghost{background:transparent;border:1px solid #C9BC9A;color:var(--text-ink);}
+.btn-ghost:hover{border-color:var(--text-ink);}
+.btn-success{background:var(--success);color:white;}
+.btn-success:hover{background:#31654B;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.agree-status{font-size:11px;font-family:var(--mono);color:var(--text-muted-light);}
+.agree-status b{color:var(--success);}
+
+/* ---------- milestones ---------- */
+.ms-list{display:flex;flex-direction:column;gap:14px;max-width:760px;margin:0 auto;}
+.ms-toolbar{max-width:760px;margin:0 auto 16px;display:flex;justify-content:flex-end;}
+.ms-card{background:white;border:1px solid #DDD3BC;border-radius:6px;overflow:hidden;}
+.ms-head{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:10px;flex-wrap:wrap;}
+.ms-head-left{display:flex;align-items:center;gap:12px;}
+.ms-name{font-family:var(--serif);font-weight:600;font-size:16px;}
+.ms-amount{font-family:var(--mono);font-size:13px;color:var(--text-muted-light);}
+.status-pill{font-family:var(--mono);font-size:9.5px;padding:4px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;white-space:nowrap;}
+.s-active{background:#E4E9F5;color:#3B4E8F;}
+.s-new{background:#EFE7D6;color:var(--warn);}
+.s-completed{background:var(--success-bg);color:var(--success);}
+.s-disputed{background:#F6DEDE;color:#A32B2B;}
+.risk-low{color:var(--success);}
+.risk-medium{color:var(--warn);}
+.risk-high{color:var(--stamp-dark);font-weight:700;}
+.dash-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.dash-link{font-size:12.5px;color:var(--stamp);cursor:pointer;text-decoration:underline;}
+.dash-table{width:100%;border-collapse:collapse;background:white;border:1px solid #DDD3BC;border-radius:6px;overflow:hidden;font-size:13px;}
+.dash-table th{text-align:left;background:var(--ink);color:var(--parchment-2);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:10px 12px;font-weight:600;}
+.dash-table td{padding:10px 12px;border-top:1px solid #F0EADA;vertical-align:middle;}
+.dash-table tr:hover td{background:var(--parchment-2);}
+.pct-wrap{display:flex;align-items:center;gap:6px;}
+.pct-bar{width:52px;height:6px;border-radius:3px;background:#EAE2CC;overflow:hidden;flex-shrink:0;}
+.pct-bar-fill{height:100%;background:var(--success);border-radius:3px;}
+.pct-bar-fill.mid{background:var(--gold);}
+.pct-label{font-family:var(--mono);font-size:11px;color:var(--text-muted-light);}
+.row-link{color:var(--stamp);cursor:pointer;text-decoration:underline;}
+.back-link{font-size:12px;color:var(--text-muted-light);cursor:pointer;padding:10px 28px 0;}
+.back-link:hover{color:var(--stamp);}
+.s-suggested{background:#EFE7D6;color:var(--warn);}
+.s-locked{background:#E4E9F5;color:#3B4E8F;}
+.s-submitted{background:#E4E9F5;color:#3B4E8F;}
+.s-revision{background:#F6E4DE;color:var(--stamp-dark);}
+.s-paid{background:#FDF1D6;color:var(--gold);}
+.s-released{background:var(--success-bg);color:var(--success);}
+.s-dispute{background:#F6DEDE;color:#A32B2B;}
+.ms-body{padding:0 18px 18px;border-top:1px solid #F0EADA;display:flex;flex-direction:column;gap:12px;}
+.ms-desc{font-size:13px;color:var(--text-muted-light);line-height:1.5;}
+.ms-meta-row{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--text-muted-light);}
+.ms-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.note-box{background:var(--parchment-2);border:1px solid #E4DBC2;border-radius:4px;padding:10px 12px;font-size:12.5px;}
+.revision-track{font-family:var(--mono);font-size:11px;color:var(--stamp-dark);}
+.timer-note{font-size:11px;font-style:italic;color:var(--text-muted-light);}
+
+/* stamp seal animation */
+.seal{position:relative;display:inline-flex;align-items:center;gap:8px;}
+.seal-mark{width:34px;height:34px;border-radius:50%;border:2.5px solid var(--stamp);color:var(--stamp);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;font-weight:700;transform:rotate(-12deg);animation:stampdown .35s ease-out;flex-shrink:0;}
+@keyframes stampdown{0%{transform:rotate(-12deg) scale(2.4);opacity:0;}60%{opacity:1;}100%{transform:rotate(-12deg) scale(1);opacity:1;}}
+
+/* ---------- ledger ---------- */
+.ledger{max-width:760px;margin:0 auto;border-left:2px solid #DDD3BC;padding-left:20px;display:flex;flex-direction:column;gap:0;}
+.ledger-entry{position:relative;padding:0 0 22px 14px;}
+.ledger-entry::before{content:'';position:absolute;left:-27px;top:3px;width:9px;height:9px;border-radius:50%;background:var(--stamp);border:2px solid var(--parchment-2);}
+.ledger-ts{font-family:var(--mono);font-size:10.5px;color:var(--text-muted-light);}
+.ledger-text{font-size:13px;margin-top:2px;}
+.ledger-actor{font-weight:700;}
+
+/* ---------- modal ---------- */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,31,56,.7);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;}
+.modal{background:var(--parchment-2);border-radius:8px;padding:26px;width:100%;max-width:440px;color:var(--text-ink);}
+.modal h3{font-family:var(--serif);margin:0 0 4px;font-size:20px;}
+.modal p{font-size:12.5px;color:var(--text-muted-light);margin:0 0 16px;}
+.modal .field{margin-bottom:12px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+
+.admin-ruling{display:flex;gap:8px;flex-wrap:wrap;}
+
+@media(max-width:820px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:40;transform:translateX(-100%);transition:.2s;}
+  .sidebar.open{transform:translateX(0);}
+  .agreement-fields{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script src="config.js"></script>
+<script>
+/* ============================= SUPABASE CONFIG =============================
+   Credentials live in config.js (next to this file), not here — so updating
+   stamped-cloud.html later never requires re-entering your Supabase details.
+   See config.js for setup steps.
+
+   Note: this talks to Supabase's REST + Auth APIs directly via fetch() rather
+   than the @supabase/supabase-js SDK, so no external SDK import is required.
+============================================================================= */
+const cfg = window.STAMPED_CONFIG || {};
+const SUPABASE_URL = cfg.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = cfg.SUPABASE_ANON_KEY || '';
+
+const supabaseConfigured = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('YOUR_SUPABASE_URL')
+  && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_KEY');
+
+let supabaseError = null;
+
+/* ---------- session (custom DB auth, only used when supabaseConfigured) ---------- */
+const SESSION_KEY = 'stamped_session_v2';
+let session = null; // { token, userId, userCode }
+
+function loadSessionFromStorage(){
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    session = raw ? JSON.parse(raw) : null;
+  }catch(e){ session = null; }
+}
+function saveSessionToStorage(){
+  try{
+    if(session) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    else localStorage.removeItem(SESSION_KEY);
+  }catch(e){ /* storage unavailable — session just won't survive a refresh */ }
+}
+
+// apikey/Authorization stay the anon key always now — there's no per-user
+// Supabase Auth JWT. Identity instead travels as a custom header that the
+// database's RLS policies read via current_setting('request.headers', ...).
+function sbHeaders(extra={}){
+  const headers = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type':'application/json', ...extra };
+  if(session?.token) headers['X-Session-Token'] = session.token;
+  return headers;
+}
+async function sbSelect(table, query=''){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, { headers: sbHeaders() });
+  if(!res.ok) throw new Error(`${table} select failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
+async function sbInsert(table, row){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method:'POST', headers: sbHeaders({Prefer:'return=minimal'}), body: JSON.stringify(row)
+  });
+  if(!res.ok) throw new Error(`${table} insert failed (${res.status}): ${await res.text()}`);
+}
+async function sbUpdate(table, id, patch){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
+    method:'PATCH', headers: sbHeaders({Prefer:'return=minimal'}), body: JSON.stringify(patch)
+  });
+  if(!res.ok) throw new Error(`${table} update failed (${res.status}): ${await res.text()}`);
+}
+async function sbDelete(table, id){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
+    method:'DELETE', headers: sbHeaders({Prefer:'return=minimal'})
+  });
+  if(!res.ok) throw new Error(`${table} delete failed (${res.status}): ${await res.text()}`);
+}
+async function sbRpc(fn, args){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:'POST', headers: sbHeaders(), body: JSON.stringify(args)
+  });
+  if(!res.ok){
+    const raw = await res.text();
+    let message = raw;
+    try{ message = JSON.parse(raw).message || raw; }catch(e){ /* not JSON, use raw text */ }
+    throw new Error(message);
+  }
+  return res.status===204 ? null : res.json();
+}
+
+async function apiRegister(firstName, lastName, password, role, initials, color, zone, region, grade, phone, notifyWhatsapp, subcategories){
+  const rows = await sbRpc('register', {
+    p_first_name: firstName, p_last_name: lastName, p_password: password,
+    p_role: role, p_initials: initials, p_color: color,
+    p_zone: zone||null, p_region: region||null, p_grade: grade||null,
+    p_phone: phone||null, p_notify_whatsapp: notifyWhatsapp!==false, p_subcategories: subcategories&&subcategories.length?subcategories:null
+  });
+  return rows[0]; // { token, user_id, user_code }
+}
+async function apiLogin(userCode, password){
+  const rows = await sbRpc('login', { p_user_code: userCode, p_password: password });
+  return rows[0]; // { token, user_id }
+}
+async function apiLogout(){
+  try{ await sbRpc('logout', {}); }catch(e){ /* ignore — we clear local session regardless */ }
+}
+async function apiValidateSession(){
+  try{ return await sbRpc('current_session_user_id', {}); }catch(e){ return null; }
+}
+async function apiChangePassword(oldPassword, newPassword){
+  await sbRpc('change_password', { p_old_password: oldPassword, p_new_password: newPassword });
+}
+async function apiAdminCreateUser(firstName, lastName, password, role, zone, region, grade, phone, subcategories){
+  const rows = await sbRpc('admin_create_user', {
+    p_first_name: firstName, p_last_name: lastName, p_password: password,
+    p_role: role, p_zone: zone||null, p_region: region||null, p_grade: grade||null,
+    p_phone: phone||null, p_subcategories: subcategories&&subcategories.length?subcategories:null
+  });
+  return rows[0]; // { user_id, user_code }
+}
+async function apiStartProject(title, subcategory, description){
+  const rows = await sbRpc('start_project', { p_title: title, p_subcategory: subcategory, p_description: description||null });
+  return rows[0]; // { project_id, professional_id, professional_name, category }
+}
+async function apiCreateProjectRequest(title, subcategory, description, docName, docType, docData){
+  const rows = await sbRpc('create_project_request', {
+    p_title: title, p_subcategory: subcategory, p_description: description||null,
+    p_document_name: docName||null, p_document_type: docType||null, p_document_data: docData||null
+  });
+  return rows[0]; // { request_id, category, matches: jsonb array }
+}
+async function apiUnlockQuotation(requestId, professionalId, paid){
+  const rows = await sbRpc('unlock_quotation', { p_request_id: requestId, p_professional_id: professionalId, p_paid: !!paid });
+  return rows[0]; // { project_id }
+}
+async function apiRespondToQuotation(projectId, accept){
+  await sbRpc('respond_to_quotation', { p_project_id: projectId, p_accept: !!accept });
+}
+async function apiProcessExpiredQuotations(){
+  try{ return await sbRpc('process_expired_quotations', {}); }catch(e){ console.error('expiry check failed', e); return 0; }
+}
+async function apiApproveQuotation(projectId){
+  return await sbRpc('approve_quotation', { p_project_id: projectId });
+}
+async function apiRejectQuotation(projectId){
+  return await sbRpc('reject_quotation', { p_project_id: projectId });
+}
+async function apiAdminUpdateUser(userId, role, zone, region, grade, tier){
+  await sbRpc('admin_update_user', {
+    p_user_id: userId, p_role: role||null, p_zone: zone||null,
+    p_region: region||null, p_grade: grade||null, p_tier: tier||null
+  });
+}
+
+// Fire-and-forget wrapper used at every mutation site: updates the UI optimistically
+// (already done by the caller before this runs), then persists in the background.
+// Any failure surfaces as a visible banner instead of failing silently.
+function persist(fn){
+  Promise.resolve().then(fn).then(()=>{
+    if(supabaseError){ supabaseError = null; render(); }
+  }).catch(e=>{
+    console.error('Supabase write failed:', e);
+    supabaseError = e.message || String(e);
+    render();
+  });
+}
+</script>
+<script>
+/* ============================= STATE ============================= */
+// Display metadata (name, role, initials, color) now lives inside state.users
+// so newly registered accounts behave identically to the seeded demo accounts.
+const AVATAR_COLORS = ['#B23A2E','#3B4E8F','#5B7A4F','#8A5A2E','#6B4C8A','#2E7A8A','#8A2E5C','#4F6B2E'];
+function colorForName(name){
+  let hash = 0;
+  for(let i=0;i<name.length;i++) hash = (hash*31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+function initialsForName(name){
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0]||'') + (parts[1]?.[0]||'')).toUpperCase() || '??';
+}
+
+// Project taxonomy — must match subcategory_category() in supabase-schema.sql.
+// HR subcategories weren't specified when this was requested; these five are
+// a placeholder set (see the schema file's note on this).
+const CATEGORY_SUBCATEGORIES = {
+  'IT': ['Mobile App Development', 'Website Development'],
+  'Marketing': ['Digital Marketing', 'Branding', 'Promotion', 'Lead Generation', 'SEO Optimisation', 'Market Research'],
+  'Finance': ['Balance Sheet', 'Audit Report', 'Risk Assessment', 'Business Feasibility', 'Project Proposal'],
+  'Design': ['Interior', 'Architecture', 'Landscape', 'Fashion Design', 'Product Design', 'Graphic Design'],
+  'HR': ['Recruitment', 'Payroll Management', 'Employee Engagement', 'Policy Drafting', 'Training & Development']
+};
+const ALL_CATEGORIES = Object.keys(CATEGORY_SUBCATEGORIES);
+
+// Location — Tier 1 / Tier 2 Indian cities, each mapped to a region (used the
+// same way the earlier free-text Zone/Region fields were: city = zone).
+const TIER1_CITIES = {
+  'Delhi':'North', 'Mumbai':'West', 'Bengaluru':'South', 'Chennai':'South',
+  'Kolkata':'East', 'Hyderabad':'South', 'Pune':'West', 'Ahmedabad':'West'
+};
+const TIER2_CITIES = {
+  'Jaipur':'North', 'Lucknow':'North', 'Chandigarh':'North', 'Indore':'West',
+  'Nagpur':'West', 'Vadodara':'West', 'Coimbatore':'South', 'Kochi':'South',
+  'Visakhapatnam':'South', 'Bhopal':'North', 'Patna':'East', 'Bhubaneswar':'East'
+};
+function regionForCity(city){ return TIER1_CITIES[city] || TIER2_CITIES[city] || null; }
+
+function getUser(id){
+  return (state && state.users && state.users[id]) || { name:'Unknown', role:'client', initials:'??', color:'#666' };
+}
+function roleLabel(role){ return role==='professional' ? 'Consultant' : role==='admin' ? 'Admin' : 'Client'; }
+function isAdmin(id){ return getUser(id).role==='admin'; }
+function isSuperuser(id){ return !!getUser(id).isSuperuser; }
+function switchableIds(){ return state ? Object.keys(state.users) : []; }
+
+let state = null;
+let viewingAs = 'alex';       // id of the account currently being viewed
+let currentProjectId = null;
+let currentRequestId = null;  // when set, renderMain shows the compare-quotes view instead of a single project
+let showIncomingRequests = false; // Consultant's view of pending quotation requests awaiting Accept/Reject
+let currentTab = 'chat';       // chat | milestones | ledger
+let expandedMilestone = null;
+let pendingSuggestion = null;  // draft agreement object being edited in chat, per project
+let modal = null;              // { type, ... }
+let adminView = 'dashboard';   // 'dashboard' | 'project' — which admins see by default
+let dashboardFilter = 'active'; // 'active' | 'all'
+
+function daysAgo(n){ return Date.now() - 1000*60*60*24*n; }
+function hoursAgo(n){ return Date.now() - 1000*60*60*n; }
+
+/* ============================= DB <-> JS MAPPING =============================
+   The app's in-memory `state` shape stays exactly as before (state.users = {id:{...}},
+   state.projects = [{..., messages:[], milestones:[], ledger:[]}]) so the render/action
+   code below barely changes. These functions convert to/from the normalized Postgres rows.
+================================================================================ */
+function userRowToJs(r){
+  return {
+    userCode: r.user_code || null,
+    name:r.name, role:r.role, initials:r.initials, color:r.color, tier:r.tier||'free',
+    scoreProfessional: r.score_professional==null?undefined:r.score_professional,
+    scoreClient: r.score_client==null?undefined:r.score_client,
+    badges: r.badges||[], completedClean: r.completed_clean||0, disputesLost: r.disputes_lost||0,
+    zone: r.zone||null, region: r.region||null, grade: r.grade||null,
+    isSuperuser: !!r.is_superuser, phone: r.phone||null, notifyWhatsapp: r.notify_whatsapp!==false,
+    turnover: Number(r.turnover)||0, resubmissionsCount: r.resubmissions_count||0, disputesCount: r.disputes_count||0
+  };
+}
+function userJsToRow(id, u){
+  const row = {
+    id, name:u.name, role:u.role, initials:u.initials, color:u.color, tier:u.tier||'free',
+    score_professional: u.scoreProfessional===undefined?null:u.scoreProfessional,
+    score_client: u.scoreClient===undefined?null:u.scoreClient,
+    badges: u.badges||[], completed_clean: u.completedClean||0, disputes_lost: u.disputesLost||0,
+    zone: u.zone||null, region: u.region||null, grade: u.grade||null,
+    phone: u.phone||null, notify_whatsapp: u.notifyWhatsapp!==false,
+    turnover: u.turnover||0, resubmissions_count: u.resubmissionsCount||0, disputes_count: u.disputesCount||0
+  };
+  // Only send user_code if we already know it (e.g. updating an existing
+  // profile) — omit it entirely on first insert so the database trigger
+  // generates the lastname+first3letters+0001-9999 code server-side.
+  if(u.userCode) row.user_code = u.userCode;
+  return row;
+}
+function projectRowToJs(r){
+  return {
+    id:r.id, title:r.title, tier:r.tier||'free', professional:r.professional_id, client:r.client_id,
+    createdAt: new Date(r.created_at).getTime(), disputeStage:r.dispute_stage||0,
+    zone: r.zone||null, region: r.region||null,
+    category: r.category||null, subcategory: r.subcategory||null, description: r.description||null,
+    requestId: r.request_id||null,
+    responseStatus: r.response_status||'accepted',
+    responseDeadline: r.response_deadline ? new Date(r.response_deadline).getTime() : null,
+    quotationApproved: !!r.quotation_approved,
+    legalAgreementUnlocked: !!r.legal_agreement_unlocked,
+    messages:[], milestones:[], ledger:[]
+  };
+}
+function projectJsToRow(p){
+  return {
+    id:p.id, title:p.title, tier:p.tier, professional_id:p.professional, client_id:p.client,
+    dispute_stage:p.disputeStage||0, zone:p.zone||null, region:p.region||null,
+    category:p.category||null, subcategory:p.subcategory||null, description:p.description||null,
+    request_id:p.requestId||null,
+    response_status: p.responseStatus||'accepted',
+    response_deadline: p.responseDeadline ? new Date(p.responseDeadline).toISOString() : null,
+    quotation_approved: !!p.quotationApproved,
+    legal_agreement_unlocked: !!p.legalAgreementUnlocked,
+    created_at:new Date(p.createdAt).toISOString()
+  };
+}
+function requestRowToJs(r){
+  return {
+    id:r.id, client:r.client_id, title:r.title, category:r.category, subcategory:r.subcategory,
+    description:r.description||'', zone:r.zone||null, region:r.region||null,
+    documentName:r.document_name||null, documentType:r.document_type||null, documentData:r.document_data||null,
+    createdAt:new Date(r.created_at).getTime(), matches:[], projectIds:[]
+  };
+}
+function matchRowToJs(r){
+  return { professionalId:r.professional_id, score:Number(r.match_score), rank:r.rank };
+}
+function messageRowToJs(r){ return { id:r.id, sender:r.sender_id, text:r.text, ts:new Date(r.created_at).getTime() }; }
+function messageJsToRow(projectId, m){ return { id:m.id||uid('msg'), project_id:projectId, sender_id:m.sender, text:m.text, created_at:new Date(m.ts).toISOString() }; }
+
+function milestoneRowToJs(r){
+  return {
+    id:r.id, name:r.name, description:r.description||'', amount:Number(r.amount)||0,
+    deadline:r.deadline||'', reviewWindow:r.review_window||'', status:r.status,
+    revisionsUsed:r.revisions_used||0,
+    agreedBy:{ professional:!!r.agreed_professional, client:!!r.agreed_client },
+    proposedBy:r.proposed_by||null,
+    confirmedAt: r.confirmed_at ? new Date(r.confirmed_at).getTime() : null,
+    submission: r.submission || null,
+    paymentHeldAt: r.payment_held_at ? new Date(r.payment_held_at).getTime() : null,
+    releasedAt: r.released_at ? new Date(r.released_at).getTime() : null,
+    disputeStage: r.dispute_stage||0, rulingNote: r.ruling_note||null,
+    _projectId: r.project_id
+  };
+}
+function milestoneJsToRow(projectId, ms){
+  return {
+    id:ms.id, project_id:projectId, name:ms.name, description:ms.description||'',
+    amount:ms.amount||0, deadline:ms.deadline||'', review_window:ms.reviewWindow||'',
+    status:ms.status, revisions_used:ms.revisionsUsed||0,
+    agreed_professional: !!ms.agreedBy?.professional, agreed_client: !!ms.agreedBy?.client,
+    proposed_by: ms.proposedBy||null,
+    confirmed_at: ms.confirmedAt ? new Date(ms.confirmedAt).toISOString() : null,
+    submission: ms.submission||null,
+    payment_held_at: ms.paymentHeldAt ? new Date(ms.paymentHeldAt).toISOString() : null,
+    released_at: ms.releasedAt ? new Date(ms.releasedAt).toISOString() : null,
+    dispute_stage: ms.disputeStage||0, ruling_note: ms.rulingNote||null
+  };
+}
+function ledgerRowToJs(r){ return { id:r.id, ts:new Date(r.created_at).getTime(), text:r.text }; }
+function ledgerJsToRow(projectId, entry){ return { id:entry.id||uid('ledger'), project_id:projectId, text:entry.text, created_at:new Date(entry.ts).toISOString() }; }
+
+function defaultState(){
+
+  /* ---- Project 1: fresh project, chat only — demonstrates auto-detection from scratch ---- */
+  const proj1 = {
+    id:'proj_northside', title:'Brand Identity — Northside Cafe', tier:'free',
+    professional:'alex', client:'priya', createdAt: daysAgo(3),
+    messages:[
+      {sender:'priya', text:'Hi Alex! Loved your portfolio. We need a full brand identity for our new cafe.', ts: daysAgo(3)},
+      {sender:'alex', text:'Thanks Priya! Happy to help. What\'s the scope you had in mind?', ts: daysAgo(3)+1000*60*4},
+      {sender:'priya', text:'Logo, menu design and signage. Budget is around ₹18000.', ts: daysAgo(3)+1000*60*9},
+      {sender:'alex', text:'Sounds good — I can deliver the full brand identity within 10 days.', ts: daysAgo(3)+1000*60*13}
+    ],
+    milestones:[], ledger:[{ts:daysAgo(3), text:'Project created and connected on Stamped.'}], disputeStage:0,
+    zone:'Mumbai-3', region:'West'
+  };
+
+  /* ---- Project 2: milestone awaiting client review ---- */
+  const proj2 = {
+    id:'proj_launchvideo', title:'Product Launch Video — Aarambh App', tier:'free',
+    professional:'alex', client:'meera', createdAt: daysAgo(9),
+    messages:[
+      {sender:'meera', text:'We need a 60-second launch video for our app, ₹35000, deadline in 12 days.', ts: daysAgo(9)},
+      {sender:'alex', text:'Got it — storyboard, voiceover and edit included. I\'ll lock that in.', ts: daysAgo(9)+1000*60*6},
+      {sender:'alex', text:'Preview is up for review whenever you get a chance to look.', ts: hoursAgo(20)}
+    ],
+    milestones:[{
+      id:'ms_launch1', name:'Milestone 1', description:'60-second product launch video: storyboard, voiceover and edit.',
+      amount:35000, deadline:'12 days', reviewWindow:'48 hours', status:'submitted', revisionsUsed:0,
+      confirmedAt: daysAgo(8), submission:{note:'Watermarked low-res cut uploaded for review.', ts:hoursAgo(20)},
+      paymentHeldAt:null, releasedAt:null, disputeStage:0
+    }],
+    ledger:[
+      {ts:daysAgo(9), text:'Project created and connected on Stamped.'},
+      {ts:daysAgo(9)+1000*60*6, text:'Stamped detected milestone details in chat and suggested an agreement card.'},
+      {ts:daysAgo(8), text:'Agreement "Milestone 1" (₹35,000) confirmed by both parties and locked. Immutable record created.'},
+      {ts:hoursAgo(20), text:'Professional submitted a watermarked preview for "Milestone 1". Full files remain locked until payment.'}
+    ], disputeStage:0,
+    zone:'Bengaluru-1', region:'South'
+  };
+
+  /* ---- Project 3: one completed milestone (released) + a second locked, in progress ---- */
+  const proj3 = {
+    id:'proj_portfolio', title:'Portfolio Website Rebuild', tier:'pro',
+    professional:'devraj', client:'priya', createdAt: daysAgo(21),
+    messages:[
+      {sender:'priya', text:'We\'d like a full portfolio site rebuild, ₹60000 total, split into design and build.', ts: daysAgo(21)},
+      {sender:'devraj', text:'Let\'s split it: Milestone 1 is the design pass, ₹25000, deadline 6 days.', ts: daysAgo(21)+1000*60*10},
+      {sender:'priya', text:'Design looks great, approved and paid! Excited for the build.', ts: daysAgo(14)},
+      {sender:'devraj', text:'Milestone 2 is the full build and launch, ₹35000, deadline 10 days.', ts: daysAgo(13)}
+    ],
+    milestones:[
+      {
+        id:'ms_port1', name:'Milestone 1 — Design Pass', description:'Full homepage and project-page design mockups.',
+        amount:25000, deadline:'6 days', reviewWindow:'48 hours', status:'released', revisionsUsed:1,
+        confirmedAt: daysAgo(20), submission:{note:'Watermarked design mockups uploaded.', ts:daysAgo(16)},
+        paymentHeldAt: daysAgo(15), releasedAt: daysAgo(14), disputeStage:0
+      },
+      {
+        id:'ms_port2', name:'Milestone 2 — Build & Launch', description:'Full responsive build and deployment of the approved design.',
+        amount:35000, deadline:'10 days', reviewWindow:'48 hours', status:'locked', revisionsUsed:0,
+        confirmedAt: daysAgo(13), submission:null, paymentHeldAt:null, releasedAt:null, disputeStage:0
+      }
+    ],
+    ledger:[
+      {ts:daysAgo(21), text:'Project created and connected on Stamped.'},
+      {ts:daysAgo(21)+1000*60*10, text:'Agreement "Milestone 1 — Design Pass" (₹25,000) confirmed by both parties and locked.'},
+      {ts:daysAgo(17), text:'Client requested a revision on "Milestone 1 — Design Pass" (1/2 used).'},
+      {ts:daysAgo(16), text:'Professional re-submitted a revised preview for "Milestone 1 — Design Pass".'},
+      {ts:daysAgo(15), text:'Payment of ₹25,000 collected and held in platform wallet (commission 2% deducted at transfer). High-res files unlocked.'},
+      {ts:daysAgo(14), text:'Client confirmed the delivery was satisfactory. ₹24,500 released to professional (2% commission retained). Reputation updated.'},
+      {ts:daysAgo(13), text:'Agreement "Milestone 2 — Build & Launch" (₹35,000) confirmed by both parties and locked.'}
+    ], disputeStage:0,
+    zone:'Mumbai-3', region:'West'
+  };
+
+  /* ---- Project 4: milestone in admin mediation — demonstrates dispute flow ---- */
+  const proj4 = {
+    id:'proj_wedding', title:'Wedding Photography Package', tier:'free',
+    professional:'alex', client:'priya', createdAt: daysAgo(30),
+    messages:[
+      {sender:'priya', text:'We need full-day wedding coverage, ₹45000, deliverable in 20 days.', ts: daysAgo(30)},
+      {sender:'alex', text:'Locking that in — 400+ edited photos, delivered as one milestone.', ts: daysAgo(30)+1000*60*8},
+      {sender:'priya', text:'The edit style isn\'t what we discussed — this is the second time.', ts: daysAgo(6)},
+      {sender:'alex', text:'I followed the brief we agreed on. I\'d like this reviewed by the team.', ts: daysAgo(5)}
+    ],
+    milestones:[{
+      id:'ms_wedding1', name:'Milestone 1 — Full Coverage Edit', description:'400+ edited photos from full-day wedding coverage.',
+      amount:45000, deadline:'20 days', reviewWindow:'48 hours', status:'dispute2', revisionsUsed:2,
+      confirmedAt: daysAgo(29), submission:{note:'Re-edited gallery uploaded for review.', ts:daysAgo(7)},
+      paymentHeldAt:null, releasedAt:null, disputeStage:2
+    }],
+    ledger:[
+      {ts:daysAgo(30), text:'Project created and connected on Stamped.'},
+      {ts:daysAgo(29), text:'Agreement "Milestone 1 — Full Coverage Edit" (₹45,000) confirmed by both parties and locked.'},
+      {ts:daysAgo(10), text:'Client requested a revision on "Milestone 1 — Full Coverage Edit" (1/2 used).'},
+      {ts:daysAgo(8), text:'Client requested a revision on "Milestone 1 — Full Coverage Edit" (2/2 used).'},
+      {ts:daysAgo(7), text:'Professional re-submitted a revised preview for "Milestone 1 — Full Coverage Edit".'},
+      {ts:daysAgo(6), text:'Client disagreed after all free revisions were used. Dispute Stage 1 — Self Resolution triggered (48hr window).'},
+      {ts:daysAgo(5), text:'Stage 1 self-resolution failed. Escalated to Stage 2 — Admin Mediation.'}
+    ], disputeStage:2,
+    zone:'Mumbai-3', region:'West'
+  };
+
+  return {
+    users:{
+      alex:{ name:'Alex Rivera', role:'professional', initials:'AR', color:'#B23A2E', tier:'free', scoreProfessional:74, badges:['Reliable'], completedClean:4, disputesLost:0, zone:'Mumbai-3', region:'West' },
+      priya:{ name:'Priya Nair', role:'client', initials:'PN', color:'#3B4E8F', tier:'free', scoreClient:81, badges:['Reliable'], completedClean:4, disputesLost:0, zone:'Mumbai-3', region:'West' },
+      meera:{ name:'Meera Iyer', role:'client', initials:'MI', color:'#5B7A4F', tier:'free', scoreClient:66, badges:['Rising Talent'], completedClean:1, disputesLost:0, zone:'Bengaluru-1', region:'South' },
+      devraj:{ name:'Devraj Rao', role:'professional', initials:'DR', color:'#8A5A2E', tier:'pro', scoreProfessional:88, badges:['Trusted'], completedClean:7, disputesLost:0, zone:'Delhi-2', region:'North' },
+      admin1:{ name:'Stamped Admin', role:'admin', initials:'SA', color:'#4B4B4B', tier:'free', badges:[], completedClean:0, disputesLost:0, grade:3, zone:null, region:null }
+    },
+    projects:[proj1, proj2, proj3, proj4],
+    requests:{}
+  };
+}
+
+async function loadState(){
+  if(!supabaseConfigured){
+    // No Supabase credentials configured yet — run the old local-only demo
+    // (account switcher, no real login) so the app is still browsable.
+    state = defaultState();
+    return;
+  }
+  if(!session){
+    // Not logged in yet — nothing to load. The auth screen takes over in render().
+    state = { users:{}, projects:[], requests:{} };
+    return;
+  }
+  try{
+    // Lazy housekeeping: there's no real background scheduler wired up, so
+    // this is the trigger point for the 6-hour response SLA — any project
+    // that's timed out gets marked expired and auto-advanced to the next
+    // match here, before we read the (possibly just-updated) project list.
+    await apiProcessExpiredQuotations();
+
+    const [userRows, projectRows, messageRows, milestoneRows, ledgerRows, requestRows, matchRows] = await Promise.all([
+      sbSelect('users', 'select=*'),
+      sbSelect('projects', 'select=*&order=created_at.asc'),
+      sbSelect('messages', 'select=*&order=created_at.asc'),
+      sbSelect('milestones', 'select=*&order=created_at.asc'),
+      sbSelect('ledger_entries', 'select=*&order=created_at.asc'),
+      sbSelect('project_requests', 'select=*&order=created_at.asc'),
+      sbSelect('project_request_matches', 'select=*&order=rank.asc')
+    ]);
+    supabaseError = null;
+
+    const users = {};
+    userRows.forEach(r => { users[r.id] = userRowToJs(r); });
+
+    const projects = projectRows.map(projectRowToJs);
+    const byId = {};
+    projects.forEach(p => { byId[p.id] = p; });
+
+    messageRows.forEach(r => { const p = byId[r.project_id]; if(p) p.messages.push(messageRowToJs(r)); });
+    milestoneRows.forEach(r => { const p = byId[r.project_id]; if(p) p.milestones.push(milestoneRowToJs(r)); });
+    ledgerRows.forEach(r => { const p = byId[r.project_id]; if(p) p.ledger.push(ledgerRowToJs(r)); });
+
+    const requests = {};
+    requestRows.forEach(r => { requests[r.id] = requestRowToJs(r); });
+    matchRows.forEach(r => {
+      const req = requests[r.request_id];
+      if(req) req.matches.push(matchRowToJs(r));
+    });
+    // Link each unlocked thread (a project with request_id set) back onto its request.
+    projects.forEach(p => {
+      if(p.requestId && requests[p.requestId]) requests[p.requestId].projectIds.push(p.id);
+    });
+
+    // Projects/messages/milestones/ledger/requests/matches arriving here are
+    // already scoped by Supabase RLS to what this signed-in user (or admin)
+    // is allowed to see — this is real database-enforced visibility, not
+    // just a UI filter.
+    state = { users, projects, requests };
+    return;
+  }catch(e){
+    console.error('Supabase load failed:', e);
+    supabaseError = e.message || String(e);
+  }
+  state = { users:{}, projects:[], requests:{} };
+}
+
+function fmtMoney(n){ return '₹' + Number(n).toLocaleString('en-IN'); }
+function fmtTs(ts){
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) + ' · ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+function log(project, text){
+  const entry = { id: uid('ledger'), ts:Date.now(), text };
+  project.ledger.push(entry);
+  if(supabaseConfigured) persist(()=> sbInsert('ledger_entries', ledgerJsToRow(project.id, entry)));
+}
+
+function otherRole(role){ return role==='professional' ? 'client' : 'professional'; }
+function roleOf(userId, project){ return userId===project.professional ? 'professional' : 'client'; }
+function userIdForRole(role, project){ return role==='professional' ? project.professional : project.client; }
+
+/* ============================= AGREEMENT DETECTION ============================= */
+function detectAgreement(text){
+  const amountMatch = text.match(/₹\s?([\d,]{2,})/) || text.match(/(?:rs\.?|inr)\s?([\d,]{2,})/i);
+  const hasDeadline = /deadline|by (mon|tue|wed|thu|fri|sat|sun)|in \d+\s?days?|within \d+\s?days?|next week/i.test(text);
+  const hasDeliverable = /deliverable|milestone|logo|design|draft|mockup|wireframe|article|homepage|website|pages?|identity|brand/i.test(text);
+  if(amountMatch && (hasDeadline || hasDeliverable)){
+    const deadlineDaysMatch = text.match(/(\d+)\s?days?/);
+    return {
+      name: 'Milestone 1',
+      description: text.length > 90 ? text.slice(0,90)+'…' : text,
+      amount: amountMatch[1].replace(/,/g,''),
+      deadline: deadlineDaysMatch ? deadlineDaysMatch[1] + ' days' : '7 days',
+      reviewWindow: '48 hours'
+    };
+  }
+  return null;
+}
+
+/* ============================= REPUTATION ============================= */
+function badgesFor(profile, role){
+  const badges = [];
+  const clean = profile.completedClean || 0;
+  const lost = profile.disputesLost || 0;
+  if(clean >= 1 && clean < 3) badges.push('Rising Talent');
+  if(clean >= 3 && lost === 0) badges.push('Reliable');
+  if(clean >= 6 && lost === 0) badges.push('Trusted');
+  if(profile.mediator) badges.push('Verified Mediator');
+  return badges;
+}
+function bumpScore(userId, role, delta){
+  const u = state.users[userId];
+  const key = role==='professional' ? 'scoreProfessional' : 'scoreClient';
+  u[key] = Math.max(0, Math.min(100, (u[key]||50) + delta));
+}
+// Local (optimistic) mirror of what bump_reputation() does server-side for
+// the new matching-formula inputs — keeps the UI in sync immediately instead
+// of waiting on the next full reload.
+function bumpStats(userId, turnoverDelta=0, resubmissionsInc=0, disputesCountInc=0){
+  const u = state.users[userId];
+  if(!u) return;
+  u.turnover = (u.turnover||0) + turnoverDelta;
+  u.resubmissionsCount = (u.resubmissionsCount||0) + resubmissionsInc;
+  u.disputesCount = (u.disputesCount||0) + disputesCountInc;
+}
+function persistUser(userId){
+  if(supabaseConfigured) persist(()=> sbUpdate('users', userId, userJsToRow(userId, state.users[userId])));
+}
+// Reputation changes often affect the OTHER party in a project (e.g. a client's
+// action bumps the consultant's score), which RLS's "update your own row only"
+// policy on `users` won't allow directly. bump_reputation is a SECURITY DEFINER
+// RPC that permits this specifically between real project counterparts (or admins).
+// The three trailing params feed the consultant-matching formula in
+// start_project(): turnover (₹ released), resubmissions, and disputes entered.
+function persistReputation(userId, role, scoreDelta, completedInc=0, disputesInc=0, turnoverDelta=0, resubmissionsInc=0, disputesCountInc=0){
+  if(supabaseConfigured) persist(()=> sbRpc('bump_reputation', {
+    p_user_id: userId, p_role: role, p_score_delta: scoreDelta,
+    p_completed_inc: completedInc, p_disputes_inc: disputesInc,
+    p_turnover_delta: turnoverDelta, p_resubmissions_inc: resubmissionsInc, p_disputes_count_inc: disputesCountInc
+  }));
+}
+function persistMilestone(project, ms){
+  if(supabaseConfigured) persist(()=> sbUpdate('milestones', ms.id, milestoneJsToRow(project.id, ms)));
+}
+function persistProjectDispute(project){
+  if(supabaseConfigured) persist(()=> sbUpdate('projects', project.id, { dispute_stage: project.disputeStage }));
+}
+
+/* ============================= RENDER ============================= */
+function el(html){ const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  if(!supabaseConfigured){
+    app.appendChild(renderSetupBanner());
+  } else {
+    if(supabaseError) app.appendChild(renderErrorBanner());
+    if(!session){ app.appendChild(renderAuthScreen()); return; }
+    if(!state.users[viewingAs]){
+      // Session exists but no matching profile (e.g. account was removed
+      // from the database directly) — treat it as a stale/invalid session.
+      session = null; saveSessionToStorage();
+      app.appendChild(renderAuthScreen());
+      return;
+    }
+  }
+
+  app.appendChild(renderTopbar());
+  const bodyWrap = el('<div class="body-wrap"></div>');
+  bodyWrap.appendChild(renderSidebar());
+  bodyWrap.appendChild(renderMain());
+  app.appendChild(bodyWrap);
+  if(modal) app.appendChild(renderModal());
+}
+
+function renderSetupBanner(){
+  const configMissing = !window.STAMPED_CONFIG;
+  return el(`<div style="background:var(--stamp);color:white;padding:10px 20px;font-size:12.5px;text-align:center;font-family:var(--sans);">
+    <b>Local-only mode.</b> ${configMissing
+      ? 'config.js was not found — make sure it sits in the same folder as this file and is uploaded alongside it.'
+      : 'Add your Supabase URL and anon key to config.js to enable cloud persistence and real login.'}
+    See supabase-schema.sql and README for setup steps. Changes right now will not survive a page refresh.
+  </div>`);
+}
+
+function renderErrorBanner(){
+  return el(`<div style="background:#8E2C22;color:white;padding:10px 20px;font-size:12.5px;text-align:center;font-family:var(--sans);">
+    <b>Supabase request failed:</b> ${escapeHtml(supabaseError)} — check the table exists (run supabase-schema.sql), the URL/key are correct, and RLS policies were created.
+  </div>`);
+}
+
+/* ---------- auth screens (only used when supabaseConfigured) ---------- */
+let authView = 'login';   // 'login' | 'register'
+let authError = null;
+let authBusy = false;
+let regStep = 1;          // 1 = role + location, 2 = name/phone/password, 3 = consultant specializations
+let regData = { role:'client', city:'', zone:'', region:'', grade:null,
+                firstName:'', lastName:'', phone:'', password:'', notifyWhatsapp:true, subcategories:[] };
+
+function resetRegistration(){
+  regStep = 1;
+  regData = { role:'client', city:'', zone:'', region:'', grade:null,
+              firstName:'', lastName:'', phone:'', password:'', notifyWhatsapp:true, subcategories:[] };
+}
+
+function renderAuthScreen(){
+  const wrap = el(`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:20px;"></div>`);
+  const card = el(`<div style="width:100%;max-width:420px;background:var(--parchment-2);border-radius:8px;padding:32px;color:var(--text-ink);"></div>`);
+  wrap.appendChild(card);
+
+  card.appendChild(el(`<div style="font-family:var(--serif);font-weight:700;font-size:24px;margin-bottom:2px;">STAMPED<span style="color:var(--stamp)">.</span></div>`));
+  card.appendChild(el(`<div style="font-size:12px;color:var(--text-muted-light);font-style:italic;font-family:var(--serif);margin-bottom:22px;">Work together. Honestly. With everything on record.</div>`));
+
+  const tabs = el(`<div style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid #DDD3BC;"></div>`);
+  ['login','register'].forEach(v=>{
+    const t = el(`<div style="flex:1;text-align:center;padding:10px;cursor:pointer;font-size:13px;font-weight:600;color:${authView===v?'var(--stamp)':'var(--text-muted-light)'};border-bottom:2px solid ${authView===v?'var(--stamp)':'transparent'};">${v==='login'?'Log In':'Register'}</div>`);
+    t.onclick = ()=>{ authView=v; authError=null; resetRegistration(); render(); };
+    tabs.appendChild(t);
+  });
+  card.appendChild(tabs);
+
+  if(authError) card.appendChild(el(`<div style="background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:9px 12px;font-size:12.5px;margin-bottom:14px;">${escapeHtml(authError)}</div>`));
+
+  if(authView==='login'){
+    card.appendChild(renderLoginForm());
+  } else {
+    const stepCount = regData.role==='professional' ? 3 : 2;
+    card.appendChild(el(`<div style="font-size:11px;color:var(--text-muted-light);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;">Step ${regStep} of ${stepCount}</div>`));
+    if(regStep===1) card.appendChild(renderRegisterStep1());
+    else if(regStep===2) card.appendChild(renderRegisterStep2());
+    else card.appendChild(renderRegisterStep3());
+  }
+
+  return wrap;
+}
+
+function authField(id, label, type, placeholder='', value=''){
+  return el(`<div class="field" style="margin-bottom:12px;"><label>${label}</label><input id="${id}" type="${type}" placeholder="${placeholder}" value="${escapeAttr(value)}" style="border:1px solid #DDD3BC;border-radius:4px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:white;width:100%;"/></div>`);
+}
+function selectStyle(){
+  return 'padding:9px 11px;border-radius:4px;border:1px solid #DDD3BC;background:white;font-family:var(--sans);width:100%;';
+}
+
+function renderLoginForm(){
+  const f = el('<div></div>');
+  f.appendChild(authField('login-userid','User ID','text','e.g. SharmaABC0001'));
+  f.appendChild(authField('login-password','Password','password','••••••••'));
+  const btn = el(`<button class="btn btn-stamp" style="width:100%;padding:11px;margin-top:6px;">${authBusy?'Logging in…':'Log In'}</button>`);
+  btn.disabled = authBusy;
+  btn.onclick = async ()=>{
+    const userId = document.getElementById('login-userid').value.trim();
+    const password = document.getElementById('login-password').value;
+    if(!userId || !password){ authError='Enter your User ID and password.'; render(); return; }
+    authBusy = true; authError = null; render();
+    try{
+      const result = await apiLogin(userId, password);
+      session = { token: result.token, userId: result.user_id, userCode: userId };
+      saveSessionToStorage();
+      viewingAs = session.userId;
+      currentProjectId = null;
+      await loadState();
+    }catch(e){
+      authError = e.message || 'Log in failed.';
+    }
+    authBusy = false; render();
+  };
+  f.appendChild(btn);
+  return f;
+}
+
+/* ---------- Registration Step 1: role + location ---------- */
+function renderRegisterStep1(){
+  const f = el('<div></div>');
+  const roleSelect = el(`<select id="reg-role" style="${selectStyle()}">
+      <option value="client" ${regData.role==='client'?'selected':''}>Client — hiring a consultant</option>
+      <option value="professional" ${regData.role==='professional'?'selected':''}>Consultant — offering services</option>
+      <option value="admin" ${regData.role==='admin'?'selected':''}>Admin — platform oversight</option>
+    </select>`);
+  const roleField = el(`<div class="field" style="margin-bottom:12px;"><label>I am registering as</label></div>`);
+  roleField.appendChild(roleSelect);
+  f.appendChild(roleField);
+
+  // Client/Consultant: a single city dropdown (Tier 1 / Tier 2). Admin: grade,
+  // then the city (Grade 1) or a region-only dropdown (Grade 2) that grade scopes to.
+  const locationWrap = el('<div></div>');
+  f.appendChild(locationWrap);
+
+  function cityOptions(selected){
+    let html = `<option value="">Select a city…</option><optgroup label="Tier 1 Cities">`;
+    Object.keys(TIER1_CITIES).forEach(c=>{ html += `<option value="${c}" ${selected===c?'selected':''}>${c}</option>`; });
+    html += `</optgroup><optgroup label="Tier 2 Cities">`;
+    Object.keys(TIER2_CITIES).forEach(c=>{ html += `<option value="${c}" ${selected===c?'selected':''}>${c}</option>`; });
+    html += `</optgroup>`;
+    return html;
+  }
+  function regionOptions(selected){
+    const regions = [...new Set([...Object.values(TIER1_CITIES), ...Object.values(TIER2_CITIES)])];
+    return `<option value="">Select a region…</option>` + regions.map(r=>`<option value="${r}" ${selected===r?'selected':''}>${r}</option>`).join('');
+  }
+
+  function syncLocation(){
+    locationWrap.innerHTML = '';
+    const role = roleSelect.value;
+    if(role==='admin'){
+      const gradeSelect = el(`<select id="reg-grade" style="${selectStyle()}">
+        <option value="1" ${regData.grade===1?'selected':''}>Grade 1 — Zonal support</option>
+        <option value="2" ${regData.grade===2?'selected':''}>Grade 2 — Regional escalation</option>
+        <option value="3" ${regData.grade===3?'selected':''}>Grade 3 — Country head (full access)</option>
+      </select>`);
+      const gradeField = el(`<div class="field" style="margin-bottom:12px;"><label>Admin grade</label></div>`);
+      gradeField.appendChild(gradeSelect);
+      locationWrap.appendChild(gradeField);
+
+      const cityField = el(`<div class="field" style="margin-bottom:12px;"><label>Location (city)</label></div>`);
+      const citySelect = el(`<select id="reg-city">${cityOptions(regData.city)}</select>`);
+      citySelect.style.cssText = selectStyle();
+      cityField.appendChild(citySelect);
+
+      const regionField = el(`<div class="field" style="margin-bottom:12px;"><label>Region</label></div>`);
+      const regionSelect = el(`<select id="reg-region-only">${regionOptions(regData.region)}</select>`);
+      regionSelect.style.cssText = selectStyle();
+      regionField.appendChild(regionSelect);
+
+      function syncGradeFields(){
+        const grade = Number(gradeSelect.value);
+        cityField.style.display = grade===1 ? '' : 'none';
+        regionField.style.display = grade===2 ? '' : 'none';
+      }
+      gradeSelect.onchange = syncGradeFields;
+      locationWrap.appendChild(cityField);
+      locationWrap.appendChild(regionField);
+      syncGradeFields();
+    } else {
+      const cityField = el(`<div class="field" style="margin-bottom:12px;"><label>Location (city)</label></div>`);
+      const citySelect = el(`<select id="reg-city">${cityOptions(regData.city)}</select>`);
+      citySelect.style.cssText = selectStyle();
+      cityField.appendChild(citySelect);
+      locationWrap.appendChild(cityField);
+    }
+  }
+  roleSelect.onchange = syncLocation;
+  syncLocation();
+
+  const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:9px 12px;font-size:12.5px;margin-bottom:10px;"></div>`);
+  f.insertBefore(errBox, roleField);
+
+  const btn = el('<button class="btn btn-stamp" style="width:100%;padding:11px;margin-top:6px;">Next</button>');
+  btn.onclick = ()=>{
+    const role = roleSelect.value;
+    const showErr = (msg)=>{ errBox.textContent = msg; errBox.style.display='block'; };
+    let city='', zone='', region='', grade=null;
+    if(role==='admin'){
+      grade = Number(document.getElementById('reg-grade').value);
+      if(grade===1){
+        city = document.getElementById('reg-city').value;
+        if(!city){ showErr('Select a zone (city) for a Grade 1 admin.'); return; }
+        zone = city; region = regionForCity(city);
+      } else if(grade===2){
+        region = document.getElementById('reg-region-only').value;
+        if(!region){ showErr('Select a region for a Grade 2 admin.'); return; }
+      }
+      // Grade 3 needs neither
+    } else {
+      city = document.getElementById('reg-city').value;
+      if(!city){ showErr('Select your city.'); return; }
+      zone = city; region = regionForCity(city);
+    }
+    regData.role = role; regData.city = city; regData.zone = zone; regData.region = region; regData.grade = grade;
+    regStep = 2;
+    render();
+  };
+  f.appendChild(btn);
+  return f;
+}
+
+/* ---------- Registration Step 2: name, phone, password, consent ---------- */
+function renderRegisterStep2(){
+  const f = el('<div></div>');
+  const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:9px 12px;font-size:12.5px;margin-bottom:10px;"></div>`);
+  f.appendChild(errBox);
+  f.appendChild(authField('reg-first','First name','text','e.g. ABC', regData.firstName));
+  f.appendChild(authField('reg-last','Last name','text','e.g. Sharma', regData.lastName));
+  f.appendChild(authField('reg-phone','Phone number','tel','e.g. 98765 43210', regData.phone));
+  f.appendChild(authField('reg-password','Password','password','At least 6 characters', regData.password));
+
+  const consentRow = el(`<label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text-muted-light);margin:4px 0 16px;line-height:1.4;">
+    <input id="reg-notify" type="checkbox" ${regData.notifyWhatsapp?'checked':''} style="margin-top:2px;"/>
+    <span>Yes, send me updates on WhatsApp / RCS <span style="opacity:.7">(not active yet — just saving your preference)</span></span>
+  </label>`);
+  f.appendChild(consentRow);
+
+  const actions = el('<div style="display:flex;gap:8px;"></div>');
+  const back = el('<button class="btn btn-ghost" style="flex:1;padding:11px;">Back</button>');
+  back.onclick = ()=>{
+    regData.firstName = document.getElementById('reg-first').value.trim();
+    regData.lastName = document.getElementById('reg-last').value.trim();
+    regData.phone = document.getElementById('reg-phone').value.trim();
+    regData.password = document.getElementById('reg-password').value;
+    regData.notifyWhatsapp = document.getElementById('reg-notify').checked;
+    regStep = 1; render();
+  };
+  const isConsultant = regData.role==='professional';
+  const nextBtn = el(`<button class="btn btn-stamp" style="flex:2;padding:11px;">${authBusy?'Please wait…':(isConsultant?'Next':'Create Account')}</button>`);
+  nextBtn.onclick = async ()=>{
+    const firstName = document.getElementById('reg-first').value.trim();
+    const lastName = document.getElementById('reg-last').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const notifyWhatsapp = document.getElementById('reg-notify').checked;
+    const showErr = (msg)=>{ errBox.textContent = msg; errBox.style.display='block'; };
+    if(!firstName || !lastName || !phone || !password){ showErr('Fill in first name, last name, phone and password.'); return; }
+    if(password.length < 6){ showErr('Password must be at least 6 characters.'); return; }
+
+    regData.firstName = firstName; regData.lastName = lastName; regData.phone = phone;
+    regData.password = password; regData.notifyWhatsapp = notifyWhatsapp;
+
+    if(isConsultant){
+      regStep = 3; render();
+      return;
+    }
+    await submitRegistration(showErr);
+  };
+  actions.appendChild(back); actions.appendChild(nextBtn);
+  f.appendChild(actions);
+  return f;
+}
+
+/* ---------- Registration Step 3 (Consultants only): specializations ---------- */
+function renderRegisterStep3(){
+  const f = el('<div></div>');
+  const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:9px 12px;font-size:12.5px;margin-bottom:10px;"></div>`);
+  f.appendChild(errBox);
+  f.appendChild(el(`<p style="font-size:12.5px;color:var(--text-muted-light);margin:-4px 0 12px;">Pick every subcategory you offer — you can select more than one, across categories.</p>`));
+
+  ALL_CATEGORIES.forEach(cat=>{
+    f.appendChild(el(`<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted-light);margin:12px 0 6px;">${cat}</div>`));
+    const grid = el('<div style="display:flex;flex-direction:column;gap:6px;"></div>');
+    CATEGORY_SUBCATEGORIES[cat].forEach(sub=>{
+      const row = el(`<label style="display:flex;align-items:center;gap:8px;font-size:13px;">
+        <input type="checkbox" data-sub="${escapeAttr(sub)}" ${regData.subcategories.includes(sub)?'checked':''}/>
+        <span>${sub}</span>
+      </label>`);
+      grid.appendChild(row);
+    });
+    f.appendChild(grid);
+  });
+
+  const actions = el('<div style="display:flex;gap:8px;margin-top:18px;"></div>');
+  const back = el('<button class="btn btn-ghost" style="flex:1;padding:11px;">Back</button>');
+  back.onclick = ()=>{
+    regData.subcategories = [...f.querySelectorAll('[data-sub]')].filter(c=>c.checked).map(c=>c.dataset.sub);
+    regStep = 2; render();
+  };
+  const createBtn = el(`<button class="btn btn-stamp" style="flex:2;padding:11px;">${authBusy?'Creating account…':'Create Account'}</button>`);
+  createBtn.onclick = async ()=>{
+    const selected = [...f.querySelectorAll('[data-sub]')].filter(c=>c.checked).map(c=>c.dataset.sub);
+    const showErr = (msg)=>{ errBox.textContent = msg; errBox.style.display='block'; };
+    if(selected.length===0){ showErr('Select at least one subcategory you offer.'); return; }
+    regData.subcategories = selected;
+    await submitRegistration(showErr);
+  };
+  actions.appendChild(back); actions.appendChild(createBtn);
+  f.appendChild(actions);
+  return f;
+}
+
+async function submitRegistration(showErr){
+  authBusy = true; authError = null; render();
+  try{
+    const name = `${regData.firstName} ${regData.lastName}`;
+    const result = await apiRegister(
+      regData.firstName, regData.lastName, regData.password, regData.role,
+      initialsForName(name), colorForName(name),
+      regData.zone||null, regData.region||null, regData.grade||null,
+      regData.phone||null, regData.notifyWhatsapp, regData.subcategories
+    );
+    session = { token: result.token, userId: result.user_id, userCode: result.user_code };
+    saveSessionToStorage();
+    viewingAs = session.userId;
+    currentProjectId = null;
+    await loadState();
+    modal = { type:'show-user-id', code: result.user_code };
+    resetRegistration();
+    authBusy = false; render();
+  }catch(e){
+    authBusy = false;
+    if(showErr) showErr(e.message || 'Registration failed.');
+    else { authError = e.message || 'Registration failed.'; render(); }
+  }
+}
+
+
+function renderTopbar(){
+  const bar = el(`<div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">STAMPED<span>.</span></div>
+      <div class="brand-tag">Work together. Honestly. With everything on record.</div>
+    </div>
+    <div class="topbar-right"></div>
+  </div>`);
+  const right = bar.querySelector('.topbar-right');
+
+  const me = getUser(viewingAs);
+  if(me.role!=='admin'){
+    const tierPill = el(`<div class="tier-pill ${me.tier==='pro'?'pro':''}">${me.tier} tier</div>`);
+    right.appendChild(tierPill);
+  } else {
+    right.appendChild(el(`<div class="tier-pill" style="border-color:var(--stamp);color:var(--stamp)">admin</div>`));
+  }
+
+  const switcher = el('<div class="role-switch"></div>');
+  const dot = el(`<span class="avatar-dot" style="background:${me.color}">${me.initials}</span>`);
+  switcher.appendChild(dot);
+
+  if(supabaseConfigured){
+    switcher.appendChild(el(`<span style="color:var(--parchment-2);font-size:12.5px;font-weight:600;padding:0 4px;">${escapeHtml(me.name)} · ${roleLabel(me.role)}</span>`));
+    right.appendChild(switcher);
+    const pwBtn = el('<button class="btn btn-ghost" style="padding:8px 12px;border-color:var(--ink-line);color:var(--parchment-2);">Change Password</button>');
+    pwBtn.onclick = ()=>{ modal = { type:'change-password' }; render(); };
+    right.appendChild(pwBtn);
+    const logoutBtn = el('<button class="new-project-btn" style="width:auto;padding:8px 14px;">Log out</button>');
+    logoutBtn.onclick = async ()=>{
+      await apiLogout();
+      session = null;
+      saveSessionToStorage();
+      state = { users:{}, projects:[], requests:{} };
+      currentProjectId = null;
+      currentRequestId = null;
+      adminView = 'dashboard'; dashboardFilter = 'active';
+      authView = 'login'; authError = null;
+      render();
+    };
+    right.appendChild(logoutBtn);
+  } else {
+    const select = el(`<select class="account-select"></select>`);
+    switchableIds().forEach(id=>{
+      const u = getUser(id);
+      const opt = el(`<option value="${id}" ${id===viewingAs?'selected':''}>${u.name} · ${roleLabel(u.role)}</option>`);
+      select.appendChild(opt);
+    });
+    select.onchange = ()=>{ viewingAs = select.value; currentProjectId=null; expandedMilestone=null; render(); };
+    switcher.appendChild(select);
+    right.appendChild(switcher);
+
+    const registerBtn = el('<button class="new-project-btn" style="width:auto;padding:8px 14px;">+ Register</button>');
+    registerBtn.onclick = ()=>{ modal = { type:'register', name:'', role:'client' }; render(); };
+    right.appendChild(registerBtn);
+  }
+
+  return bar;
+}
+
+function renderSidebar(){
+  const user = getUser(viewingAs);
+  const sb = el('<div class="sidebar"></div>');
+
+  if(user.role==='admin'){
+    return renderAdminSidebar(sb);
+  }
+
+  const profile = state.users[viewingAs];
+  const roleKey = user.role; // 'professional' | 'client'
+  const badges = badgesFor(profile, roleKey);
+
+  const repCard = el(`<div class="rep-card">
+    <div class="rep-card-name">${user.name}</div>
+    <div class="rep-card-role">${profile.userCode ? `ID: ${profile.userCode} · ` : ''}Viewing as ${roleLabel(user.role)} · Score visible only to the other party at project start</div>
+    <div class="badge-row">${badges.length ? badges.map(b=>`<span class="badge">${b}</span>`).join('') : '<span class="badge none">No badges yet</span>'}</div>
+    <div class="rep-score-note">Completed cleanly: ${profile.completedClean||0} · Disputes lost: ${profile.disputesLost||0}</div>
+  </div>`);
+  sb.appendChild(el('<div class="sidebar-section-label">Your Reputation</div>'));
+  sb.appendChild(repCard);
+
+  sb.appendChild(el('<div class="sidebar-section-label" style="margin-top:6px">Your Projects</div>'));
+  const list = el('<div class="project-list"></div>');
+  // Visibility: clients and consultants only ever see projects they're actually part of.
+  const myProjects = state.projects.filter(p => p.professional===viewingAs || p.client===viewingAs);
+
+  if(user.role==='client'){
+    const myRequests = Object.values(state.requests||{}).filter(r => r.client===viewingAs);
+    const ungrouped = myProjects.filter(p => !p.requestId);
+    if(myRequests.length===0 && ungrouped.length===0){
+      list.appendChild(el(`<div class="timer-note" style="padding:6px 6px 2px">No projects yet — start one below.</div>`));
+    }
+    myRequests.forEach(r=>{
+      const unlockedCount = r.projectIds.length;
+      const item = el(`<div class="project-item ${r.id===currentRequestId?'active':''}">
+        <div class="project-item-title">${escapeHtml(r.title)}</div>
+        <div class="project-item-meta">${unlockedCount}/${r.matches.length} consultant${r.matches.length!==1?'s':''} unlocked · ${r.subcategory}</div>
+      </div>`);
+      item.onclick = ()=>{ currentRequestId = r.id; currentProjectId=null; render(); };
+      list.appendChild(item);
+    });
+    ungrouped.forEach(p=>{
+      const other = getUser(p.professional);
+      const item = el(`<div class="project-item ${p.id===currentProjectId?'active':''}">
+        <div class="project-item-title">${p.title}</div>
+        <div class="project-item-meta">with ${other.name} · ${p.milestones.length} milestone${p.milestones.length!==1?'s':''}</div>
+      </div>`);
+      item.onclick = ()=>{ currentProjectId = p.id; currentRequestId=null; currentTab='chat'; expandedMilestone=null; render(); };
+      list.appendChild(item);
+    });
+  } else {
+    const pending = myProjects.filter(p => p.responseStatus==='pending');
+    const settled = myProjects.filter(p => p.responseStatus!=='pending');
+    if(myProjects.length===0){
+      list.appendChild(el(`<div class="timer-note" style="padding:6px 6px 2px">No projects yet — you\u2019ll appear here once a Client unlocks a quotation with you.</div>`));
+    }
+    if(pending.length>0){
+      const banner = el(`<div class="project-item ${showIncomingRequests?'active':''}" style="border-color:var(--stamp);">
+        <div class="project-item-title" style="color:var(--stamp);">⏱ ${pending.length} Incoming Request${pending.length!==1?'s':''}</div>
+        <div class="project-item-meta">Respond within 6 hours or it moves to the next consultant</div>
+      </div>`);
+      banner.onclick = ()=>{ showIncomingRequests = true; currentProjectId=null; currentRequestId=null; render(); };
+      list.appendChild(banner);
+    }
+    settled.forEach(p=>{
+      const other = getUser(p.client);
+      const statusNote = p.responseStatus==='rejected' ? ' · Declined' : p.responseStatus==='expired' ? ' · Expired' : '';
+      const item = el(`<div class="project-item ${p.id===currentProjectId && !showIncomingRequests?'active':''}">
+        <div class="project-item-title">${p.title}</div>
+        <div class="project-item-meta">with ${other.name} · ${p.milestones.length} milestone${p.milestones.length!==1?'s':''}${statusNote}</div>
+      </div>`);
+      item.onclick = ()=>{ currentProjectId = p.id; currentRequestId=null; showIncomingRequests=false; currentTab='chat'; expandedMilestone=null; render(); };
+      list.appendChild(item);
+    });
+  }
+  sb.appendChild(list);
+
+  if(getUser(viewingAs).role==='client'){
+    const newBtn = el('<button class="new-project-btn">+ Start new project</button>');
+    newBtn.onclick = ()=>{
+      modal = supabaseConfigured
+        ? { type:'start-project', step:1, title:'', subcategory:'', description:'' }
+        : { type:'new-project', title:'', otherId:'', tier:'free' };
+      render();
+    };
+    sb.appendChild(newBtn);
+  } else if(!supabaseConfigured){
+    // Local-only demo mode has no real matching engine, so it keeps the old
+    // direct-connect flow available to either role for easy click-through testing.
+    const newBtn = el('<button class="new-project-btn">+ Start new project</button>');
+    newBtn.onclick = ()=>{ modal = { type:'new-project', title:'', otherId:'', tier:'free' }; render(); };
+    sb.appendChild(newBtn);
+  }
+
+  return sb;
+}
+
+function renderAdminSidebar(sb){
+  const allUsers = Object.keys(state.users).map(id=>({id, ...state.users[id]}));
+  const clients = allUsers.filter(u=>u.role==='client');
+  const consultants = allUsers.filter(u=>u.role==='professional');
+  const openDisputes = state.projects.reduce((n,p)=> n + p.milestones.filter(m=>m.status==='dispute1'||m.status==='dispute2').length, 0);
+  const me = getUser(viewingAs);
+  const gradeLabel = me.grade===1 ? `Grade 1 · Zonal support — ${me.zone||'no zone set'}`
+    : me.grade===2 ? `Grade 2 · Regional escalation — ${me.region||'no region set'}`
+    : me.grade===3 ? `Grade 3 · Country head — full access`
+    : `Grade not set`;
+
+  const overview = el(`<div class="rep-card">
+    <div class="rep-card-name">${me.name}</div>
+    <div class="rep-card-role">${gradeLabel}</div>
+    <div class="rep-score-note" style="margin-top:10px;line-height:1.7">
+      ${clients.length} client${clients.length!==1?'s':''} · ${consultants.length} consultant${consultants.length!==1?'s':''}<br>
+      ${state.projects.length} project${state.projects.length!==1?'s':''} · ${openDisputes} open dispute${openDisputes!==1?'s':''}
+    </div>
+  </div>`);
+  sb.appendChild(el('<div class="sidebar-section-label">Platform Overview</div>'));
+  sb.appendChild(overview);
+
+  const dashBtn = el(`<button class="new-project-btn" style="margin-bottom:6px;">${adminView==='dashboard'?'✓ ':''}Open Project Dashboard</button>`);
+  dashBtn.onclick = ()=>{ adminView='dashboard'; render(); };
+  sb.appendChild(dashBtn);
+
+  sb.appendChild(el('<div class="sidebar-section-label" style="margin-top:14px">All Users</div>'));
+  const iAmSuper = isSuperuser(viewingAs);
+  const userList = el('<div class="project-list"></div>');
+  allUsers.filter(u=> iAmSuper || u.role!=='admin').forEach(u=>{
+    const score = u.role==='professional' ? u.scoreProfessional : u.scoreClient;
+    const gradeNote = u.role==='admin' ? ` · ${u.isSuperuser ? 'Superuser' : `Grade ${u.grade||'—'}`}` : '';
+    const item = el(`<div class="project-item" style="cursor:${iAmSuper?'pointer':'default'}">
+      <div class="project-item-title">${u.name} <span style="font-weight:400;color:var(--text-muted-dark);opacity:.7">· ${roleLabel(u.role)}${gradeNote}</span></div>
+      <div class="project-item-meta">${u.userCode ? `${u.userCode} · ` : ''}${u.role==='admin' ? (u.zone||u.region||'—') : `Score ${score??'—'} · ${u.completedClean||0} completed · ${u.disputesLost||0} disputes lost`}</div>
+    </div>`);
+    if(iAmSuper && !u.isSuperuser){
+      item.onclick = ()=>{ modal = { type:'admin-manage-user', mode:'search', query:'', selectedUserId: u.id }; render(); };
+    }
+    userList.appendChild(item);
+  });
+  sb.appendChild(userList);
+
+  return sb;
+}
+
+function renderMain(){
+  const main = el('<div class="main"></div>');
+  const admin = isAdmin(viewingAs);
+
+  if(admin && (adminView==='dashboard' || !currentProjectId)){
+    main.appendChild(renderAdminDashboard());
+    return main;
+  }
+
+  const isClient = !admin && getUser(viewingAs).role==='client';
+  if(isClient && !currentProjectId){
+    const myRequests = Object.values(state.requests||{}).filter(r=>r.client===viewingAs);
+    if(!currentRequestId && myRequests.length>0) currentRequestId = myRequests[myRequests.length-1].id;
+    if(currentRequestId && state.requests[currentRequestId]){
+      main.appendChild(renderRequestView(state.requests[currentRequestId]));
+      return main;
+    }
+  }
+
+  const isProfessional = !admin && getUser(viewingAs).role==='professional';
+  if(isProfessional && showIncomingRequests){
+    main.appendChild(renderIncomingRequestsView());
+    return main;
+  }
+
+  const visibleProjects = admin ? state.projects : state.projects.filter(p=>p.professional===viewingAs||p.client===viewingAs);
+  const project = visibleProjects.find(p=>p.id===currentProjectId) || visibleProjects[0];
+  if(project) currentProjectId = project.id;
+
+  if(!project){
+    main.appendChild(el(admin
+      ? `<div class="empty-state"><h3>No projects on the platform yet</h3><p>Once clients and consultants start connecting, every project will be visible here.</p></div>`
+      : `<div class="empty-state"><h3>No projects yet</h3><p>Start a new project from the sidebar to connect with a client or consultant.</p></div>`));
+    return main;
+  }
+
+  if(admin){
+    const back = el('<div class="back-link">&larr; Back to Dashboard</div>');
+    back.onclick = ()=>{ adminView='dashboard'; render(); };
+    main.appendChild(back);
+  } else if(project.requestId && state.requests[project.requestId]){
+    const back = el('<div class="back-link">&larr; Back to compare quotations</div>');
+    back.onclick = ()=>{ currentRequestId = project.requestId; currentProjectId = null; render(); };
+    main.appendChild(back);
+  }
+
+  const myRole = admin ? 'admin' : roleOf(viewingAs, project);
+  const proUser = getUser(project.professional), cliUser = getUser(project.client);
+  const partiesLine = admin
+    ? `${proUser.name} (Consultant) ↔ ${cliUser.name} (Client)`
+    : `with ${getUser(myRole==='professional'?project.client:project.professional).name}`;
+
+  main.appendChild(el(`<div class="main-header">
+    <div>
+      <div class="main-title">${project.title}</div>
+      <div class="main-sub">${partiesLine} · ${project.tier} tier (${project.tier==='pro'?'2%':'5%'} commission) · Project ID ${project.id}</div>
+    </div>
+  </div>`));
+
+  const tabs = el('<div class="tabs"></div>');
+  [['description','Project Description'],['chat','Chat'],['milestones',`Milestones`],['ledger','Ledger']].forEach(([key,label])=>{
+    const count = key==='milestones' ? project.milestones.length : (key==='ledger'?project.ledger.length:null);
+    const t = el(`<div class="tab ${currentTab===key?'active':''}">${label}${count!==null?`<span class="tab-count">${count}</span>`:''}</div>`);
+    t.onclick = ()=>{ currentTab = key; render(); };
+    tabs.appendChild(t);
+  });
+  main.appendChild(tabs);
+
+  const panel = el('<div class="panel"></div>');
+  if(currentTab==='description') panel.appendChild(renderProjectDescription(project, myRole));
+  if(currentTab==='chat') panel.appendChild(renderChat(project, myRole));
+  if(currentTab==='milestones') panel.appendChild(renderMilestones(project, myRole));
+  if(currentTab==='ledger') panel.appendChild(renderLedger(project));
+  main.appendChild(panel);
+
+  return main;
+}
+
+/* ---------- project description tab ---------- */
+function renderProjectDescription(project, myRole){
+  const wrap = el('<div style="max-width:720px;margin:0 auto;"></div>');
+  const req = project.requestId ? state.requests[project.requestId] : null;
+
+  const category = req ? req.category : project.category;
+  const subcategory = req ? req.subcategory : project.subcategory;
+  const description = req ? req.description : project.description;
+
+  if(!category && !subcategory && !description){
+    wrap.appendChild(el(`<div class="empty-state" style="padding:40px 20px"><h3>No description on file</h3><p>This project was created before the category/description fields existed, or none was entered.</p></div>`));
+    return wrap;
+  }
+  wrap.appendChild(el(`<div class="ms-meta-row" style="margin-bottom:16px">
+    <span>Category: <b>${escapeHtml(category||'—')}</b></span>
+    <span>Sub-category: <b>${escapeHtml(subcategory||'—')}</b></span>
+  </div>`));
+
+  if(req && myRole==='client'){
+    // The Client owns this — one shared editable description, kept in sync
+    // across every consultant thread under the same request. Reuses the
+    // same editor component the compare-quotes view uses, so the word
+    // limit and document upload behave identically from either place.
+    wrap.appendChild(el(`<div class="timer-note" style="margin-bottom:8px">Shared with every consultant you're comparing on this request — one edit updates it everywhere.</div>`));
+    wrap.appendChild(renderSharedDescriptionEditor(req));
+  } else if(req){
+    wrap.appendChild(el(`<div class="timer-note" style="margin-bottom:8px">Shared brief from the client — the same description every consultant they're comparing sees.</div>`));
+    wrap.appendChild(el(`<div class="note-box" style="white-space:pre-wrap;line-height:1.6;">${escapeHtml(description || 'No description was provided.')}</div>`));
+  } else {
+    wrap.appendChild(el(`<div class="note-box" style="white-space:pre-wrap;line-height:1.6;">${escapeHtml(description || 'No description was provided.')}</div>`));
+    if(req.documentName){
+      const dlBtn = el(`<button class="btn btn-ghost" style="margin-top:10px;">📎 Download ${escapeHtml(req.documentName)}</button>`);
+      dlBtn.onclick = ()=> downloadDataUrl(req.documentName, req.documentType||'application/octet-stream', req.documentData);
+      wrap.appendChild(dlBtn);
+    }
+  }
+  return wrap;
+}
+
+/* ---------- compare-quotes view (Clients) ---------- */
+function renderRequestView(request){
+  const wrap = el('<div class="panel"></div>');
+  wrap.appendChild(el(`<div class="main-title" style="margin-bottom:4px">${escapeHtml(request.title)}</div>`));
+  wrap.appendChild(el(`<div class="main-sub" style="margin-bottom:18px">${escapeHtml(request.category)} · ${escapeHtml(request.subcategory)} · Comparing ${request.matches.length} consultant${request.matches.length!==1?'s':''}</div>`));
+
+  wrap.appendChild(renderSharedDescriptionEditor(request));
+
+  const grid = el('<div style="display:flex;flex-direction:column;gap:16px;margin-top:20px;"></div>');
+  const sortedMatches = [...request.matches].sort((a,b)=>a.rank-b.rank);
+  const nextIsFree = request.projectIds.length === 0; // true until the first unlock happens, matches server logic exactly
+  sortedMatches.forEach(m=>{
+    const proj = state.projects.find(p=>p.requestId===request.id && p.professional===m.professionalId);
+    grid.appendChild(renderMatchCard(request, m, nextIsFree, proj));
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+function countWords(text){
+  return (text||'').trim().split(/\s+/).filter(Boolean).length;
+}
+const MAX_DESCRIPTION_WORDS = 500;
+const MAX_DOCUMENT_BYTES = 2 * 1024 * 1024; // 2MB — stored as base64 in the DB, no external file storage configured
+const ALLOWED_DOCUMENT_TYPES = ['.txt','.doc','.ppt','.pdf'];
+
+function downloadDataUrl(filename, mimeType, base64Data){
+  const a = document.createElement('a');
+  a.href = `data:${mimeType};base64,${base64Data}`;
+  a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+function renderSharedDescriptionEditor(request){
+  const box = el('<div class="note-box"></div>');
+  box.appendChild(el(`<div style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted-light);font-weight:600;margin-bottom:6px;">Project Description — shared with every consultant below</div>`));
+  const textarea = el(`<textarea rows="4" style="border:1px solid #DDD3BC;border-radius:4px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:white;width:100%;line-height:1.5;">${escapeHtml(request.description||'')}</textarea>`);
+  box.appendChild(textarea);
+
+  const wordCountNote = el(`<div class="timer-note" style="margin-top:4px;"></div>`);
+  function syncWordCount(){
+    const n = countWords(textarea.value);
+    wordCountNote.textContent = `${n} / ${MAX_DESCRIPTION_WORDS} words`;
+    wordCountNote.style.color = n > MAX_DESCRIPTION_WORDS ? 'var(--stamp)' : '';
+  }
+  textarea.oninput = syncWordCount;
+  syncWordCount();
+  box.appendChild(wordCountNote);
+
+  const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:8px 10px;font-size:12px;margin-top:8px;"></div>`);
+  box.appendChild(errBox);
+
+  // Uploaded reference document
+  const docRow = el('<div style="margin-top:10px;"></div>');
+  function renderDocRow(){
+    docRow.innerHTML = '';
+    if(request.documentName){
+      const line = el(`<div style="display:flex;align-items:center;gap:10px;font-size:12.5px;">
+        <span>📎 <b>${escapeHtml(request.documentName)}</b></span>
+      </div>`);
+      const dlBtn = el('<button class="btn btn-ghost" style="padding:5px 10px;font-size:11.5px;">Download</button>');
+      dlBtn.onclick = ()=> downloadDataUrl(request.documentName, request.documentType||'application/octet-stream', request.documentData);
+      const rmBtn = el('<button class="btn btn-ghost" style="padding:5px 10px;font-size:11.5px;">Remove</button>');
+      rmBtn.onclick = ()=>{
+        request.documentName = null; request.documentType = null; request.documentData = null;
+        if(supabaseConfigured) persist(()=> sbUpdate('project_requests', request.id, { document_name:null, document_type:null, document_data:null }));
+        renderDocRow();
+      };
+      line.appendChild(dlBtn); line.appendChild(rmBtn);
+      docRow.appendChild(line);
+    } else {
+      const uploadBtn = el('<button class="btn btn-ghost">Upload Document</button>');
+      const fileInput = el(`<input type="file" accept=".txt,.doc,.ppt,.pdf" style="display:none;"/>`);
+      uploadBtn.onclick = ()=> fileInput.click();
+      fileInput.onchange = ()=>{
+        const file = fileInput.files[0];
+        if(!file) return;
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if(!ALLOWED_DOCUMENT_TYPES.includes(ext)){
+          errBox.textContent = `Only ${ALLOWED_DOCUMENT_TYPES.join(', ')} files are accepted.`;
+          errBox.style.display = 'block';
+          return;
+        }
+        if(file.size > MAX_DOCUMENT_BYTES){
+          errBox.textContent = 'File is too large — 2MB maximum.';
+          errBox.style.display = 'block';
+          return;
+        }
+        errBox.style.display = 'none';
+        const reader = new FileReader();
+        reader.onload = ()=>{
+          const base64 = reader.result.split(',')[1];
+          request.documentName = file.name;
+          request.documentType = file.type || 'application/octet-stream';
+          request.documentData = base64;
+          if(supabaseConfigured) persist(()=> sbUpdate('project_requests', request.id, {
+            document_name: file.name, document_type: request.documentType, document_data: base64
+          }));
+          renderDocRow();
+        };
+        reader.readAsDataURL(file);
+      };
+      docRow.appendChild(uploadBtn); docRow.appendChild(fileInput);
+      docRow.appendChild(el(`<div class="timer-note" style="margin-top:4px;">Accepted: .txt, .doc, .ppt, .pdf — 2MB max</div>`));
+    }
+  }
+  renderDocRow();
+  box.appendChild(docRow);
+
+  const row = el('<div style="margin-top:10px;display:flex;align-items:center;gap:10px;"></div>');
+  const saveBtn = el('<button class="btn btn-stamp">Update Description</button>');
+  const savedNote = el('<span class="timer-note" style="display:none;">Saved — every consultant now sees this.</span>');
+  saveBtn.onclick = ()=>{
+    const newDesc = textarea.value.trim();
+    if(countWords(newDesc) > MAX_DESCRIPTION_WORDS){
+      errBox.textContent = `Description is over the ${MAX_DESCRIPTION_WORDS}-word limit — trim it before saving.`;
+      errBox.style.display = 'block';
+      return;
+    }
+    errBox.style.display = 'none';
+    request.description = newDesc;
+    if(supabaseConfigured) persist(()=> sbUpdate('project_requests', request.id, { description: newDesc }));
+    savedNote.style.display = '';
+    setTimeout(()=>{ savedNote.style.display='none'; }, 2000);
+  };
+  row.appendChild(saveBtn); row.appendChild(savedNote);
+  box.appendChild(row);
+  return box;
+}
+
+function renderMatchCard(request, match, nextIsFree, proj){
+  const pro = getUser(match.professionalId);
+  const card = el('<div style="border:1px solid #DDD3BC;border-radius:8px;background:white;overflow:hidden;"></div>');
+  const statusPill = !proj ? '' : proj.responseStatus==='pending' ? `<span class="status-pill s-new">Awaiting response</span>`
+    : proj.responseStatus==='rejected' ? `<span class="status-pill s-disputed">Declined</span>`
+    : proj.responseStatus==='expired' ? `<span class="status-pill s-disputed">Expired</span>`
+    : `<span class="status-pill s-active">Unlocked</span>`;
+  const header = el(`<div style="padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:var(--parchment-2);border-bottom:1px solid #DDD3BC;flex-wrap:wrap;gap:6px;">
+    <div>
+      <div style="font-family:var(--serif);font-weight:600;font-size:16px;">${escapeHtml(pro.name)}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-muted-light);">Match score ${match.score}/100 · ${escapeHtml(pro.zone||'—')}</div>
+    </div>
+    ${statusPill}
+  </div>`);
+  card.appendChild(header);
+
+  if(proj){
+    const body = el('<div style="padding:14px 18px;"></div>');
+    if(proj.responseStatus==='pending'){
+      body.appendChild(el(`<div class="timer-note" style="margin-bottom:10px;">Waiting for ${escapeHtml(pro.name.split(' ')[0])} to accept — ${timeLeftLabel(proj.responseDeadline)}. If they don't respond in time, this automatically moves to the next match at no extra cost.</div>`));
+    } else if(proj.responseStatus==='rejected'){
+      body.appendChild(el(`<div class="timer-note" style="margin-bottom:10px;color:var(--stamp-dark);">${escapeHtml(pro.name.split(' ')[0])} declined this request.</div>`));
+    } else if(proj.responseStatus==='expired'){
+      body.appendChild(el(`<div class="timer-note" style="margin-bottom:10px;color:var(--stamp-dark);">This request expired without a response.</div>`));
+    }
+    const chatWrap = el('<div style="max-height:280px;overflow-y:auto;border:1px solid #F0EADA;border-radius:6px;padding:10px;margin-bottom:10px;background:var(--parchment-2);display:flex;flex-direction:column;gap:8px;"></div>');
+    proj.messages.forEach(m=>{
+      const mine = m.sender===viewingAs;
+      chatWrap.appendChild(el(`<div class="msg ${mine?'mine':'theirs'}" style="max-width:85%;">${escapeHtml(m.text)}<div class="msg-meta">${getUser(m.sender).name.split(' ')[0]} · ${fmtTs(m.ts)}</div></div>`));
+    });
+    if(proj.messages.length===0) chatWrap.appendChild(el('<div class="timer-note">No messages yet — say hello.</div>'));
+    body.appendChild(chatWrap);
+
+    const inputRow = el('<div style="display:flex;gap:8px;"></div>');
+    const input = el(`<input class="chat-input" type="text" placeholder="Message ${pro.name.split(' ')[0]}…" style="flex:1;"/>`);
+    const sendBtn = el('<button class="send-btn">Send</button>');
+    const send = ()=>{
+      const text = input.value.trim();
+      if(!text) return;
+      const msg = { id: uid('msg'), sender:viewingAs, text, ts:Date.now() };
+      proj.messages.push(msg);
+      if(supabaseConfigured) persist(()=> sbInsert('messages', messageJsToRow(proj.id, msg)));
+      input.value='';
+      render();
+    };
+    sendBtn.onclick = send;
+    input.onkeydown = (e)=>{ if(e.key==='Enter') send(); };
+    inputRow.appendChild(input); inputRow.appendChild(sendBtn);
+    body.appendChild(inputRow);
+
+    const openLink = el('<div class="dash-link" style="margin-top:10px;">Open full project (milestones, ledger) &rarr;</div>');
+    openLink.onclick = ()=>{ currentProjectId = proj.id; currentRequestId=null; currentTab='chat'; render(); };
+    body.appendChild(openLink);
+    card.appendChild(body);
+  } else {
+    const body = el('<div style="padding:18px;text-align:center;"></div>');
+    const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:8px 10px;font-size:12px;margin-bottom:10px;text-align:left;"></div>`);
+    body.appendChild(errBox);
+    const label = nextIsFree ? 'Click for Quotation — Free' : 'Click for Quotation — ₹99';
+    const btn = el(`<button class="btn btn-stamp">${label}</button>`);
+    btn.onclick = async ()=>{
+      if(!nextIsFree){
+        const ok = confirm(`Unlock a quotation chat with ${pro.name} for a simulated ₹99?`);
+        if(!ok) return;
+      }
+      btn.disabled = true; btn.textContent = 'Unlocking…';
+      try{
+        await apiUnlockQuotation(request.id, match.professionalId, !nextIsFree);
+        await loadState();
+        render();
+      }catch(e){
+        btn.disabled = false; btn.textContent = label;
+        errBox.textContent = e.message || 'Could not unlock this quotation.';
+        errBox.style.display = 'block';
+      }
+    };
+    body.appendChild(btn);
+    card.appendChild(body);
+  }
+  return card;
+}
+
+/* ---------- incoming requests (Consultants) ---------- */
+function timeLeftLabel(deadline){
+  if(!deadline) return '—';
+  const ms = deadline - Date.now();
+  if(ms <= 0) return 'Expired';
+  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+  return `${h}h ${m}m left`;
+}
+
+function renderIncomingRequestsView(){
+  const wrap = el('<div class="panel"></div>');
+  wrap.appendChild(el(`<div class="main-title" style="margin-bottom:4px">Incoming Requests</div>`));
+  wrap.appendChild(el(`<div class="main-sub" style="margin-bottom:18px">Respond within 6 hours, or it automatically moves to the next matched consultant at no cost to the client.</div>`));
+
+  const pending = state.projects.filter(p => p.professional===viewingAs && p.responseStatus==='pending');
+  if(pending.length===0){
+    wrap.appendChild(el(`<div class="empty-state" style="padding:40px 20px"><h3>Nothing waiting on you</h3><p>New quotation requests will show up here.</p></div>`));
+    return wrap;
+  }
+
+  pending.forEach(p=>{
+    const client = getUser(p.client);
+    const card = el(`<div class="ms-card" style="margin-bottom:14px;"></div>`);
+    const head = el(`<div class="ms-head" style="cursor:default;">
+      <div class="ms-head-left">
+        <div>
+          <div class="ms-name">${escapeHtml(p.title)}</div>
+          <div class="ms-amount">${escapeHtml(client.name)} · ${escapeHtml(p.subcategory||'')}</div>
+        </div>
+      </div>
+      <span class="status-pill s-new">${timeLeftLabel(p.responseDeadline)}</span>
+    </div>`);
+    card.appendChild(head);
+    const body = el('<div class="ms-body"></div>');
+    if(p.description) body.appendChild(el(`<div class="ms-desc">${escapeHtml(p.description)}</div>`));
+    const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:8px 10px;font-size:12px;"></div>`);
+    body.appendChild(errBox);
+    const actions = el('<div class="ms-actions"></div>');
+    const acceptBtn = el('<button class="btn btn-success">Accept</button>');
+    const rejectBtn = el('<button class="btn btn-ghost">Reject</button>');
+    const respond = async (accept)=>{
+      acceptBtn.disabled = true; rejectBtn.disabled = true;
+      try{
+        await apiRespondToQuotation(p.id, accept);
+        await loadState();
+        render();
+      }catch(e){
+        acceptBtn.disabled = false; rejectBtn.disabled = false;
+        errBox.textContent = e.message || 'Could not respond.';
+        errBox.style.display = 'block';
+      }
+    };
+    acceptBtn.onclick = ()=>respond(true);
+    rejectBtn.onclick = ()=>respond(false);
+    actions.appendChild(acceptBtn); actions.appendChild(rejectBtn);
+    body.appendChild(actions);
+    card.appendChild(body);
+    wrap.appendChild(card);
+  });
+
+  return wrap;
+}
+
+/* ---------- admin dashboard ---------- */
+function computeProjectValue(p){
+  return p.milestones.reduce((sum,m)=> sum + (m.amount||0), 0);
+}
+function deriveProjectStatus(p){
+  if(p.milestones.some(m=>m.status==='dispute1'||m.status==='dispute2')) return 'Disputed';
+  if(p.milestones.length===0) return 'New';
+  if(p.milestones.every(m=>m.status==='released'||m.status==='resolved')) return 'Completed';
+  return 'Active';
+}
+function deriveProjectRisk(p){
+  if(p.milestones.some(m=>m.status==='dispute1'||m.status==='dispute2')) return 'High';
+  if(p.milestones.some(m=>m.revisionsUsed>=1)) return 'Medium';
+  return 'Low';
+}
+// Percentage of the project's total contract value that's been paid out /
+// concluded so far (released milestones, plus resolved disputes — win, loss,
+// or split, the dispute process itself is done either way). Null when there's
+// no value to measure yet (no milestones locked).
+function computeProjectPercent(p){
+  const total = computeProjectValue(p);
+  if(total <= 0) return null;
+  const done = p.milestones
+    .filter(m=>m.status==='released'||m.status==='resolved')
+    .reduce((sum,m)=> sum + (m.amount||0), 0);
+  return Math.round((done/total)*100);
+}
+const STATUS_PILL_CLASS = { Active:'s-active', New:'s-new', Completed:'s-completed', Disputed:'s-disputed' };
+const RISK_CLASS = { Low:'risk-low', Medium:'risk-medium', High:'risk-high' };
+
+function renderAdminDashboard(){
+  const wrap = el('<div class="panel"></div>');
+  const titleRow = el('<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:4px;"></div>');
+  titleRow.appendChild(el(`<div class="main-title">Project Dashboard</div>`));
+  if(isSuperuser(viewingAs)){
+    const createBtn = el('<button class="btn btn-stamp">Create / Update User</button>');
+    createBtn.onclick = ()=>{ modal = { type:'admin-manage-user', mode:'create', query:'', selectedUserId:null }; render(); };
+    titleRow.appendChild(createBtn);
+  }
+  wrap.appendChild(titleRow);
+  wrap.appendChild(el(`<div class="main-sub" style="margin-bottom:18px">Ranked by contract value, highest first · scope: ${
+    (()=>{ const me=getUser(viewingAs);
+      return me.isSuperuser ? 'HQ — full access' : me.grade===1 ? `Zone: ${me.zone||'—'}` : me.grade===2 ? `Region: ${me.region||'—'}` : 'Country-wide';
+    })()
+  }</div>`));
+
+  const rows = state.projects.map(p=>({
+    project:p, value:computeProjectValue(p), status:deriveProjectStatus(p), risk:deriveProjectRisk(p), pct:computeProjectPercent(p)
+  }));
+  const filtered = dashboardFilter==='active' ? rows.filter(r=>r.status==='Active') : rows;
+  filtered.sort((a,b)=> b.value - a.value);
+
+  const toolbar = el('<div class="dash-toolbar"></div>');
+  const countNote = el(`<div class="timer-note">Showing ${filtered.length} of ${rows.length} project${rows.length!==1?'s':''}${dashboardFilter==='active'?' — filtered to Active':''}</div>`);
+  toolbar.appendChild(countNote);
+  if(dashboardFilter==='active'){
+    const link = el('<div class="dash-link">View all projects &rarr;</div>');
+    link.onclick = ()=>{ dashboardFilter='all'; render(); };
+    toolbar.appendChild(link);
+  } else {
+    const link = el('<div class="dash-link">Show Active only &rarr;</div>');
+    link.onclick = ()=>{ dashboardFilter='active'; render(); };
+    toolbar.appendChild(link);
+  }
+  wrap.appendChild(toolbar);
+
+  if(filtered.length===0){
+    wrap.appendChild(el(`<div class="empty-state" style="padding:40px 20px"><h3>No projects to show</h3><p>${dashboardFilter==='active' ? 'No Active projects right now — try "View all projects."' : 'Nothing in scope yet.'}</p></div>`));
+    return wrap;
+  }
+
+  const table = el(`<table class="dash-table">
+    <thead><tr>
+      <th>Project ID</th><th>Project Title</th><th>Location</th><th>Professional</th><th>Client</th><th>Amount</th><th>Percentage Status</th><th>Status</th><th>Risk</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>`);
+  const tbody = table.querySelector('tbody');
+  filtered.forEach(({project:p, value, status, risk, pct})=>{
+    const pro = getUser(p.professional), cli = getUser(p.client);
+    const location = p.zone ? `${p.zone}${p.region?` (${p.region})`:''}` : (p.region || '—');
+    const tr = el(`<tr>
+      <td style="font-family:var(--mono);font-size:11px;"></td>
+      <td></td>
+      <td>${escapeHtml(location)}</td>
+      <td>${escapeHtml(pro.name)}</td>
+      <td>${escapeHtml(cli.name)}</td>
+      <td style="font-family:var(--mono);font-weight:700;">${fmtMoney(value)}</td>
+      <td></td>
+      <td><span class="status-pill ${STATUS_PILL_CLASS[status]||''}">${status}</span></td>
+      <td><span class="${RISK_CLASS[risk]||''}" style="font-family:var(--mono);font-size:11.5px;">${risk}</span></td>
+    </tr>`);
+    const pctCell = tr.children[6];
+    if(pct===null){
+      pctCell.appendChild(el(`<span class="pct-label">—</span>`));
+    } else {
+      const fillClass = pct>=100 ? '' : 'mid';
+      pctCell.appendChild(el(`<div class="pct-wrap">
+        <div class="pct-bar"><div class="pct-bar-fill ${fillClass}" style="width:${Math.min(100,pct)}%"></div></div>
+        <span class="pct-label">${pct}%</span>
+      </div>`));
+    }
+    const openProject = ()=>{ adminView='project'; currentProjectId=p.id; currentTab='milestones'; expandedMilestone=null; render(); };
+    const idLink = el(`<span class="row-link">${escapeHtml(p.id)}</span>`);
+    idLink.onclick = openProject;
+    tr.children[0].appendChild(idLink);
+    const titleLink = el(`<span class="row-link">${escapeHtml(p.title)}</span>`);
+    titleLink.onclick = openProject;
+    tr.children[1].appendChild(titleLink);
+    tbody.appendChild(tr);
+  });
+  wrap.appendChild(table);
+
+  return wrap;
+}
+
+/* ---------- chat ---------- */
+function renderChat(project, myRole){
+  const wrap = el('<div></div>');
+  const scroll = el('<div class="chat-scroll"></div>');
+  project.messages.forEach(m=>{
+    const mine = m.sender === viewingAs;
+    const bubbleClass = myRole==='admin' ? (m.sender===project.professional?'theirs':'mine') : (mine?'mine':'theirs');
+    scroll.appendChild(el(`<div class="msg ${bubbleClass}">${escapeHtml(m.text)}<div class="msg-meta">${getUser(m.sender).name.split(' ')[0]} · ${fmtTs(m.ts)}</div></div>`));
+  });
+  wrap.appendChild(scroll);
+
+  if(myRole==='admin'){
+    wrap.appendChild(el(`<div class="timer-note" style="max-width:720px;margin:14px auto 0;text-align:center">Viewing as Admin — read only. Admins observe conversations but don't take part in them.</div>`));
+    return wrap;
+  }
+
+  if(pendingSuggestion && pendingSuggestion.projectId===project.id && myRole==='professional'){
+    wrap.appendChild(renderSuggestionCard(project, myRole));
+  }
+
+  const inputRow = el(`<div class="chat-input-row">
+    <input class="chat-input" type="text" placeholder="Message ${getUser(myRole==='professional'?project.client:project.professional).name.split(' ')[0]}…" />
+    <button class="send-btn">Send</button>
+  </div>`);
+  const input = inputRow.querySelector('input');
+  const send = ()=>{
+    const text = input.value.trim();
+    if(!text) return;
+    const msg = { id: uid('msg'), sender:viewingAs, text, ts:Date.now() };
+    project.messages.push(msg);
+    if(supabaseConfigured) persist(()=> sbInsert('messages', messageJsToRow(project.id, msg)));
+    const detected = detectAgreement(text);
+    if(myRole==='professional' && detected && !pendingSuggestion && !project.milestones.some(m=>m.status==='suggested'||m.status==='locked'||m.status==='in_progress'||m.status==='submitted'||m.status==='revision')){
+      const num = project.milestones.length + 1;
+      pendingSuggestion = { projectId: project.id, name: 'Milestone '+num, description: detected.description, amount: detected.amount, deadline: detected.deadline, reviewWindow: detected.reviewWindow, agreedBy:{professional:false, client:false} };
+      log(project, `Stamped detected milestone details in chat and suggested an agreement card.`);
+    }
+    input.value='';
+    render();
+    setTimeout(()=>{ const s=document.querySelector('.chat-scroll'); if(s) s.scrollTop = s.scrollHeight; },0);
+  };
+  inputRow.querySelector('.send-btn').onclick = send;
+  input.onkeydown = (e)=>{ if(e.key==='Enter') send(); };
+  wrap.appendChild(inputRow);
+  return wrap;
+}
+
+function renderSuggestionCard(project, myRole){
+  const s = pendingSuggestion;
+  const card = el(`<div class="suggestion-card">
+    <div class="suggestion-label">Suggested Agreement — detected from chat</div>
+    <div class="agreement-fields">
+      <div class="field"><label>Milestone name</label><input data-f="name" value="${escapeAttr(s.name)}"/></div>
+      <div class="field"><label>Amount (₹)</label><input data-f="amount" value="${escapeAttr(s.amount)}"/></div>
+      <div class="field full"><label>Deliverable description</label><textarea data-f="description" rows="2">${escapeHtml(s.description)}</textarea></div>
+      <div class="field"><label>Deadline</label><input data-f="deadline" value="${escapeAttr(s.deadline)}"/></div>
+      <div class="field"><label>Review window</label><input data-f="reviewWindow" value="${escapeAttr(s.reviewWindow)}"/></div>
+    </div>
+    <div class="confirm-row"></div>
+  </div>`);
+  card.querySelectorAll('[data-f]').forEach(inp=>{
+    inp.oninput = ()=>{ s[inp.dataset.f] = inp.value; };
+  });
+  const row = card.querySelector('.confirm-row');
+  const sendBtn = el('<button class="btn btn-stamp">Send Quotation to Client</button>');
+  sendBtn.onclick = ()=>{
+    if(!s.name.trim() || !Number(s.amount)){ alert('Add a milestone name and amount first.'); return; }
+    const ms = {
+      id: uid('ms'), name: s.name, description: s.description, amount: Number(s.amount)||0,
+      deadline: s.deadline, reviewWindow: s.reviewWindow, status:'proposed', revisionsUsed:0,
+      agreedBy:{professional:true, client:false}, proposedBy:'professional',
+      confirmedAt: null, submission:null, paymentHeldAt:null, releasedAt:null, disputeStage:0
+    };
+    project.milestones.push(ms);
+    log(project, `Consultant sent a quotation ("${ms.name}", ${fmtMoney(ms.amount)}) to the client for approval.`);
+    if(supabaseConfigured) persist(()=> sbInsert('milestones', milestoneJsToRow(project.id, ms)));
+    pendingSuggestion = null;
+    render();
+  };
+  row.appendChild(sendBtn);
+  const dismiss = el('<button class="btn btn-ghost">Dismiss</button>');
+  dismiss.onclick = ()=>{ pendingSuggestion=null; render(); };
+  row.appendChild(dismiss);
+  return card;
+}
+
+/* ---------- milestones ---------- */
+function renderMilestones(project, myRole){
+  const wrap = el('<div></div>');
+
+  if(myRole==='professional'){
+    const header = el('<div class="ms-toolbar"></div>');
+    const addBtn = el('<button class="btn btn-stamp">+ Propose new milestone</button>');
+    addBtn.onclick = ()=>{
+      const n = project.milestones.length + 1;
+      const ms = {
+        id: uid('ms'), name:'Milestone '+n, description:'', amount:0, deadline:'7 days', reviewWindow:'48 hours',
+        status:'proposed', revisionsUsed:0, agreedBy:{professional:true, client:false}, proposedBy:'professional',
+        confirmedAt:null, submission:null, paymentHeldAt:null, releasedAt:null, disputeStage:0
+      };
+      project.milestones.push(ms);
+      expandedMilestone = ms.id;
+      log(project, `Consultant proposed a new milestone directly.`);
+      if(supabaseConfigured) persist(()=> sbInsert('milestones', milestoneJsToRow(project.id, ms)));
+      render();
+    };
+    header.appendChild(addBtn);
+    wrap.appendChild(header);
+  }
+
+  if(myRole==='client'){
+    const proposed = project.milestones.filter(m=>m.status==='proposed');
+    if(proposed.length>0) wrap.appendChild(renderQuotationReviewPanel(project, proposed));
+  }
+
+  if(project.milestones.length===0){
+    wrap.appendChild(el(`<div class="empty-state" style="padding:40px 20px"><h3>No milestones yet</h3><p>${myRole==='admin' ? 'Nothing proposed on this project yet.' : myRole==='professional' ? 'Discuss scope in Chat and Stamped will suggest an agreement, or propose one directly with the button above.' : 'Your consultant will send a quotation with milestones here once they\u2019re ready — you can accept, reject, or comment on it.'}</p></div>`));
+    return wrap;
+  }
+  const list = el('<div class="ms-list"></div>');
+  project.milestones.forEach(ms=>{
+    list.appendChild(renderMilestoneCard(project, ms, myRole));
+  });
+  wrap.appendChild(list);
+
+  if(project.quotationApproved && myRole!=='admin'){
+    wrap.appendChild(renderLegalAgreementSection(project, myRole));
+  }
+
+  return wrap;
+}
+
+function generateLegalAgreementText(project){
+  const pro = getUser(project.professional), cli = getUser(project.client);
+  const approvedMs = project.milestones.filter(m=>['locked','submitted','revision','paid_pending','paid_held','released','resolved'].includes(m.status));
+  const total = approvedMs.reduce((s,m)=>s+(m.amount||0),0);
+  const lines = [];
+  lines.push('STAMPED — PROJECT AGREEMENT');
+  lines.push('='.repeat(40));
+  lines.push('');
+  lines.push(`Project: ${project.title}`);
+  lines.push(`Category: ${project.category||'—'} / ${project.subcategory||'—'}`);
+  lines.push(`Project ID: ${project.id}`);
+  lines.push(`Generated: ${new Date().toLocaleString('en-IN')}`);
+  lines.push('');
+  lines.push('PARTIES');
+  lines.push('-'.repeat(40));
+  lines.push(`Consultant: ${pro.name} (${pro.userCode||'—'})`);
+  lines.push(`Client: ${cli.name} (${cli.userCode||'—'})`);
+  lines.push('');
+  lines.push('PROJECT DESCRIPTION');
+  lines.push('-'.repeat(40));
+  lines.push(project.description || '(no description on file)');
+  lines.push('');
+  lines.push('APPROVED MILESTONES');
+  lines.push('-'.repeat(40));
+  approvedMs.forEach((m,i)=>{
+    lines.push(`${i+1}. ${m.name} — ${fmtMoney(m.amount)}`);
+    lines.push(`   Deliverable: ${m.description||'—'}`);
+    lines.push(`   Deadline: ${m.deadline||'—'} · Review window: ${m.reviewWindow||'—'}`);
+    lines.push(`   Status: ${(STATUS_LABEL[m.status]||['—'])[0]}`);
+    lines.push('');
+  });
+  lines.push(`TOTAL CONTRACT VALUE: ${fmtMoney(total)}`);
+  lines.push('');
+  lines.push('This document summarizes the quotation and milestones approved by both');
+  lines.push('parties on the Stamped platform. It is generated for reference purposes');
+  lines.push('as part of a paid add-on service and does not constitute independent');
+  lines.push('legal advice — consult a qualified professional before relying on it as');
+  lines.push('a binding contract.');
+  lines.push('');
+  lines.push('_'.repeat(30) + '          ' + '_'.repeat(30));
+  lines.push('Consultant signature                     Client signature');
+  return lines.join('\n');
+}
+
+function downloadTextFile(filename, content){
+  const blob = new Blob([content], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderLegalAgreementSection(project, myRole){
+  const box = el('<div class="note-box" style="margin-top:18px;"></div>');
+  box.appendChild(el(`<div class="suggestion-label" style="color:var(--gold);">Legal Agreement — paid add-on</div>`));
+  if(!project.legalAgreementUnlocked){
+    box.appendChild(el(`<div class="timer-note" style="margin-bottom:8px;">Generate a downloadable agreement summarizing the approved quotation and milestones, available to both parties. This is a paid add-on — a simulated ₹499 fee applies (no real payment gateway wired in, consistent with the rest of this app).</div>`));
+    const btn = el('<button class="btn btn-stamp">Unlock Legal Agreement — ₹499</button>');
+    btn.onclick = ()=>{
+      const ok = confirm('Unlock the downloadable legal agreement for a simulated ₹499? Available to both parties once unlocked.');
+      if(!ok) return;
+      project.legalAgreementUnlocked = true;
+      if(supabaseConfigured) persist(()=> sbUpdate('projects', project.id, { legal_agreement_unlocked: true }));
+      log(project, `${myRole==='professional'?'Consultant':'Client'} unlocked the Legal Agreement add-on.`);
+      render();
+    };
+    box.appendChild(btn);
+  } else {
+    box.appendChild(el(`<div class="timer-note" style="margin-bottom:8px;">Unlocked — available to both parties.</div>`));
+    const dlBtn = el('<button class="btn btn-stamp">Download Legal Agreement</button>');
+    dlBtn.onclick = ()=> downloadTextFile(`Stamped-Agreement-${project.id}.txt`, generateLegalAgreementText(project));
+    box.appendChild(dlBtn);
+  }
+  return box;
+}
+
+function renderQuotationReviewPanel(project, proposed){
+  const total = proposed.reduce((s,m)=>s+(m.amount||0),0);
+  const box = el('<div class="note-box" style="margin-bottom:16px;border:1.5px dashed var(--stamp);"></div>');
+  box.appendChild(el(`<div class="suggestion-label">Quotation awaiting your approval — ${proposed.length} milestone${proposed.length!==1?'s':''}, ${fmtMoney(total)} total</div>`));
+  const listBox = el('<div style="display:flex;flex-direction:column;gap:6px;margin:10px 0;"></div>');
+  proposed.forEach(m=>{
+    listBox.appendChild(el(`<div style="font-size:13px;">• <b>${escapeHtml(m.name)}</b> — ${fmtMoney(m.amount)}, due in ${escapeHtml(m.deadline)}</div>`));
+  });
+  box.appendChild(listBox);
+  box.appendChild(el(`<div class="timer-note" style="margin-bottom:8px;">Review the details below, then approve the whole quotation together — you can't edit these terms yourself, only accept, reject, or comment.</div>`));
+
+  const commentRow = el('<div style="display:flex;gap:8px;margin-bottom:10px;"></div>');
+  const commentInput = el(`<input class="chat-input" type="text" placeholder="Leave a comment on this quotation…" style="flex:1;"/>`);
+  const commentBtn = el('<button class="btn btn-ghost">Comment</button>');
+  const sendComment = ()=>{
+    const text = commentInput.value.trim();
+    if(!text) return;
+    const msg = { id: uid('msg'), sender:viewingAs, text: `💬 Quotation comment: ${text}`, ts:Date.now() };
+    project.messages.push(msg);
+    if(supabaseConfigured) persist(()=> sbInsert('messages', messageJsToRow(project.id, msg)));
+    commentInput.value = '';
+    render();
+  };
+  commentBtn.onclick = sendComment;
+  commentInput.onkeydown = (e)=>{ if(e.key==='Enter') sendComment(); };
+  commentRow.appendChild(commentInput); commentRow.appendChild(commentBtn);
+  box.appendChild(commentRow);
+
+  const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:8px 10px;font-size:12px;margin-bottom:8px;"></div>`);
+  box.appendChild(errBox);
+
+  const actions = el('<div class="ms-actions"></div>');
+  const approveBtn = el('<button class="btn btn-success">Approve Quotation &amp; Milestones</button>');
+  const rejectBtn = el('<button class="btn btn-ghost">Reject</button>');
+  approveBtn.onclick = async ()=>{
+    approveBtn.disabled = true; rejectBtn.disabled = true;
+    try{
+      if(supabaseConfigured){
+        await apiApproveQuotation(project.id);
+        await loadState();
+      } else {
+        proposed.forEach(m=>{ m.status='locked'; m.confirmedAt=Date.now(); });
+        project.quotationApproved = true;
+        log(project, `Client approved the quotation and all ${proposed.length} proposed milestone(s) together.`);
+      }
+      render();
+    }catch(e){
+      approveBtn.disabled = false; rejectBtn.disabled = false;
+      errBox.textContent = e.message || 'Could not approve.'; errBox.style.display='block';
+    }
+  };
+  rejectBtn.onclick = async ()=>{
+    approveBtn.disabled = true; rejectBtn.disabled = true;
+    try{
+      if(supabaseConfigured){
+        await apiRejectQuotation(project.id);
+        await loadState();
+      } else {
+        proposed.forEach(m=>{ m.status='rejected'; });
+        log(project, `Client rejected the quotation (${proposed.length} proposed milestone(s)).`);
+      }
+      render();
+    }catch(e){
+      approveBtn.disabled = false; rejectBtn.disabled = false;
+      errBox.textContent = e.message || 'Could not reject.'; errBox.style.display='block';
+    }
+  };
+  actions.appendChild(approveBtn); actions.appendChild(rejectBtn);
+  box.appendChild(actions);
+  return box;
+}
+
+const STATUS_LABEL = {
+  proposed:['Proposed · Awaiting Client Review','s-suggested'],
+  locked:['Locked · Not Started','s-locked'], in_progress:['In Progress','s-locked'],
+  submitted:['Awaiting Client Review','s-submitted'], revision:['Revision Requested','s-revision'],
+  paid_held:['Paid · Held In Escrow','s-paid'], released:['Released · Complete','s-released'],
+  dispute1:['Dispute · Self Resolution','s-dispute'], dispute2:['Dispute · Admin Mediation','s-dispute'],
+  resolved:['Dispute Resolved','s-released'], rejected:['Rejected by Client','s-disputed']
+};
+// Revisions are labeled R0 (original submission), R1 (first revision), R2
+// (second/final revision) rather than "1/2 used".
+function revisionLabel(n){ return 'R' + (n||0); }
+
+function renderMilestoneCard(project, ms, myRole){
+  const [label, cls] = STATUS_LABEL[ms.status] || ['—','s-locked'];
+  const card = el(`<div class="ms-card"></div>`);
+  const head = el(`<div class="ms-head">
+    <div class="ms-head-left">
+      <div>
+        <div class="ms-name">${escapeHtml(ms.name)}</div>
+        <div class="ms-amount">${fmtMoney(ms.amount)} · due in ${escapeHtml(ms.deadline)}</div>
+      </div>
+    </div>
+    <span class="status-pill ${cls}">${label}</span>
+  </div>`);
+  head.onclick = ()=>{ expandedMilestone = expandedMilestone===ms.id ? null : ms.id; render(); };
+  card.appendChild(head);
+
+  if(expandedMilestone===ms.id){
+    const body = el('<div class="ms-body"></div>');
+    if(ms.status==='rejected'){
+      body.appendChild(el(`<div class="ms-desc">${escapeHtml(ms.description||'')}</div>`));
+      body.appendChild(el(`<div class="timer-note">The client rejected this milestone as part of the quotation. The consultant can propose a fresh one if terms change.</div>`));
+    } else if(ms.status==='proposed' && myRole==='admin'){
+      body.appendChild(el(`<div class="ms-desc">${escapeHtml(ms.description||'(no description yet)')}</div>`));
+      body.appendChild(el(`<div class="timer-note">Proposed by the consultant — awaiting the client's approval. Admins observe but don't participate.</div>`));
+    } else if(ms.status==='proposed' && myRole==='professional'){
+      body.appendChild(renderProfessionalProposalEditor(project, ms));
+    } else if(ms.status==='proposed'){
+      // Client: read-only here — approval happens together for the whole
+      // quotation via the panel at the top of the Milestones tab, not per item.
+      body.appendChild(el(`<div class="ms-desc">${escapeHtml(ms.description||'')}</div>`));
+      body.appendChild(el(`<div class="timer-note">Part of the quotation above — approve, reject, or comment on it as a whole.</div>`));
+    } else {
+      body.appendChild(el(`<div class="ms-desc">${escapeHtml(ms.description)}</div>`));
+      body.appendChild(el(`<div class="ms-meta-row">
+        <span>Review window: ${escapeHtml(ms.reviewWindow)}</span>
+        <span>Revision: ${revisionLabel(ms.revisionsUsed)} (max R2)</span>
+        <span>Confirmed: ${fmtTs(ms.confirmedAt)}</span>
+      </div>`));
+      body.appendChild(renderMilestoneActions(project, ms, myRole));
+    }
+    card.appendChild(body);
+  }
+  return card;
+}
+
+function renderProfessionalProposalEditor(project, ms){
+  const wrap = el('<div></div>');
+  wrap.appendChild(el(`<div class="suggestion-label">Your quotation draft — the client sees this once you save it, and approves it together with any other proposed milestones</div>`));
+  const fields = el(`<div class="agreement-fields">
+    <div class="field"><label>Milestone name</label><input data-f="name" value="${escapeAttr(ms.name)}"/></div>
+    <div class="field"><label>Amount (₹)</label><input data-f="amount" type="number" min="0" value="${escapeAttr(ms.amount)}"/></div>
+    <div class="field full"><label>Deliverable description</label><textarea data-f="description" rows="2" placeholder="What will be delivered?">${escapeHtml(ms.description)}</textarea></div>
+    <div class="field"><label>Deadline</label><input data-f="deadline" value="${escapeAttr(ms.deadline)}"/></div>
+    <div class="field"><label>Review window</label><input data-f="reviewWindow" value="${escapeAttr(ms.reviewWindow)}"/></div>
+  </div>`);
+  fields.querySelectorAll('[data-f]').forEach(inp=>{
+    inp.oninput = ()=>{
+      const f = inp.dataset.f;
+      ms[f] = f==='amount' ? Number(inp.value)||0 : inp.value;
+    };
+  });
+  wrap.appendChild(fields);
+
+  const row = el('<div class="confirm-row"></div>');
+  const saveBtn = el('<button class="btn btn-stamp">Save Changes</button>');
+  const savedNote = el('<span class="timer-note" style="display:none;">Saved.</span>');
+  saveBtn.onclick = ()=>{
+    if(!ms.name.trim() || !ms.amount){ alert('Add a milestone name and amount first.'); return; }
+    if(supabaseConfigured) persist(()=> sbUpdate('milestones', ms.id, milestoneJsToRow(project.id, ms)));
+    savedNote.style.display=''; setTimeout(()=>{savedNote.style.display='none';},2000);
+    render();
+  };
+  row.appendChild(saveBtn); row.appendChild(savedNote);
+  const removeBtn = el('<button class="btn btn-ghost">Withdraw proposal</button>');
+  removeBtn.onclick = ()=>{
+    const msId = ms.id, msName = ms.name;
+    project.milestones = project.milestones.filter(m=>m.id!==ms.id);
+    expandedMilestone = null;
+    log(project, `Proposed milestone "${msName}" was withdrawn before the client reviewed it.`);
+    if(supabaseConfigured) persist(()=> sbDelete('milestones', msId));
+    render();
+  };
+  row.appendChild(removeBtn);
+  wrap.appendChild(row);
+  return wrap;
+}
+
+function renderMilestoneActions(project, ms, myRole){
+  const wrap = el('<div></div>');
+
+  // locked -> professional submits work
+  if(ms.status==='locked' || ms.status==='in_progress'){
+    if(myRole==='professional'){
+      const actions = el('<div class="ms-actions"></div>');
+      const btn = el('<button class="btn btn-stamp">Upload deliverable & submit preview</button>');
+      btn.onclick = ()=>{
+        ms.submission = { note:'Watermarked low-res preview uploaded.', ts:Date.now(), revisionNote: ms.submission?.revisionNote || null };
+        ms.status='submitted';
+        log(project, `Professional submitted a watermarked preview for "${ms.name}". Full files remain locked until payment.`);
+        persistMilestone(project, ms); render();
+      };
+      actions.appendChild(btn);
+      wrap.appendChild(actions);
+    } else {
+      wrap.appendChild(el(`<div class="timer-note">Waiting for the professional to submit a preview of the deliverable.</div>`));
+    }
+  }
+
+  // submitted -> client agrees/disagrees on preview
+  if(ms.status==='submitted'){
+    wrap.appendChild(el(`<div class="note-box"><b>Preview:</b> ${escapeHtml(ms.submission.note)} <span class="revision-track">— submitted ${fmtTs(ms.submission.ts)}</span></div>`));
+    if(myRole==='client'){
+      const actions = el('<div class="ms-actions"></div>');
+      const agree = el('<button class="btn btn-success">Agree — proceed to payment</button>');
+      agree.onclick = ()=>{
+        ms.status='paid_pending';
+        log(project, `Client approved the preview for "${ms.name}" and will be prompted to pay.`);
+        persistMilestone(project, ms); render();
+      };
+      const disagree = el('<button class="btn btn-ghost">Disagree — request revision</button>');
+      disagree.onclick = ()=>{
+        const proId = userIdForRole('professional', project);
+        if(ms.revisionsUsed >= 2){
+          ms.status='dispute1'; ms.disputeStage=1; project.disputeStage=1;
+          log(project, `Client disagreed after all free revisions were used on "${ms.name}". Dispute Stage 1 — Self Resolution triggered (48hr window).`);
+          persistProjectDispute(project);
+          bumpStats(proId, 0, 0, 1); // disputes entered — feeds the matching formula
+          persistReputation(proId, 'professional', 0, 0, 0, 0, 0, 1);
+        } else {
+          ms.revisionsUsed += 1;
+          ms.status='revision';
+          log(project, `Client requested a revision on "${ms.name}" — now at ${revisionLabel(ms.revisionsUsed)} (max R2).`);
+          bumpStats(proId, 0, 1, 0); // resubmission requested — feeds the matching formula
+          persistReputation(proId, 'professional', 0, 0, 0, 0, 1, 0);
+        }
+        persistMilestone(project, ms); render();
+      };
+      actions.appendChild(agree); actions.appendChild(disagree);
+      wrap.appendChild(actions);
+    } else {
+      wrap.appendChild(el(`<div class="timer-note">Waiting for client decision — Agree or Disagree.</div>`));
+    }
+  }
+
+  if(ms.status==='paid_pending'){
+    if(myRole==='client'){
+      const actions = el('<div class="ms-actions"></div>');
+      const commission = project.tier==='pro' ? 0.02 : 0.05;
+      const payBtn = el(`<button class="btn btn-stamp">Pay ${fmtMoney(ms.amount)} via ${project.tier==='pro'?'Razorpay':'Razorpay'} Route</button>`);
+      payBtn.onclick = ()=>{
+        ms.status='paid_held'; ms.paymentHeldAt = Date.now();
+        log(project, `Payment of ${fmtMoney(ms.amount)} collected and held in platform wallet (commission ${(commission*100).toFixed(0)}% deducted at transfer). High-res files unlocked.`);
+        persistMilestone(project, ms); render();
+      };
+      actions.appendChild(payBtn);
+      wrap.appendChild(actions);
+      wrap.appendChild(el(`<div class="timer-note">Commission on release: ${(commission*100).toFixed(0)}% (${project.tier} tier)</div>`));
+    } else {
+      wrap.appendChild(el(`<div class="timer-note">Client is being prompted to pay. Funds will be held in escrow, not with you directly, until final approval.</div>`));
+    }
+  }
+
+  // revision -> back to professional to resubmit
+  if(ms.status==='revision'){
+    wrap.appendChild(el(`<div class="note-box">Revision requested${ms.submission?.revisionNote?': '+escapeHtml(ms.submission.revisionNote):''}. Now at ${revisionLabel(ms.revisionsUsed)} (max R2).</div>`));
+    if(myRole==='professional'){
+      const actions = el('<div class="ms-actions"></div>');
+      const btn = el('<button class="btn btn-stamp">Re-submit revised preview</button>');
+      btn.onclick = ()=>{
+        ms.submission = { note:'Revised watermarked preview uploaded.', ts:Date.now() };
+        ms.status='submitted';
+        log(project, `Professional re-submitted a revised preview for "${ms.name}".`);
+        persistMilestone(project, ms); render();
+      };
+      actions.appendChild(btn);
+      wrap.appendChild(actions);
+    } else {
+      wrap.appendChild(el(`<div class="timer-note">Waiting for the professional to re-submit.</div>`));
+    }
+  }
+
+  // paid_held -> client final approval or 48hr auto release
+  if(ms.status==='paid_held'){
+    wrap.appendChild(el(`<div class="note-box"><b>High-resolution files unlocked.</b> Paid ${fmtMoney(ms.amount)} on ${fmtTs(ms.paymentHeldAt)}. Auto-releases after 48 hours if no issue is raised.</div>`));
+    const actions = el('<div class="ms-actions"></div>');
+    if(myRole==='client'){
+      const confirmBtn = el('<button class="btn seal"><span class="seal-mark" style="display:none"></span>Confirm satisfactory — release payment</button>');
+      confirmBtn.classList.add('btn-success');
+      confirmBtn.onclick = ()=>{ releaseMilestonePayment(project, ms, 'Client confirmed the delivery was satisfactory.'); };
+      actions.appendChild(confirmBtn);
+    } else {
+      actions.appendChild(el('<div class="timer-note">Waiting for client final approval, or 48-hour auto-release.</div>'));
+    }
+    const simBtn = el('<button class="btn btn-ghost">Simulate 48hr window passing (no issue raised)</button>');
+    simBtn.onclick = ()=>{ releaseMilestonePayment(project, ms, 'No issue was raised within the 48-hour review window — payment auto-released.'); };
+    actions.appendChild(simBtn);
+    wrap.appendChild(actions);
+  }
+
+  if(ms.status==='released'){
+    wrap.appendChild(el(`<div class="note-box seal"><span class="seal-mark">STAMP<br>✓</span><div><b>Milestone complete.</b> ${fmtMoney(ms.amount)} released to professional on ${fmtTs(ms.releasedAt)}. Reputation updated for both parties.</div></div>`));
+  }
+
+  // dispute stage 1
+  if(ms.status==='dispute1'){
+    wrap.appendChild(el(`<div class="note-box">Stage 1 — Self Resolution. Stamped shows both parties a side-by-side of the original agreement vs. submitted work. 48 hours to resolve directly in chat.</div>`));
+    const actions = el('<div class="ms-actions"></div>');
+    const resolveBtn = el('<button class="btn btn-success">Mark resolved in chat — resume project</button>');
+    resolveBtn.onclick = ()=>{
+      ms.status='revision'; ms.disputeStage=0; project.disputeStage=0;
+      const proId1 = userIdForRole('professional',project), cliId1 = userIdForRole('client',project);
+      bumpScore(proId1,'professional',2);
+      bumpScore(cliId1,'client',2);
+      log(project, `Dispute on "${ms.name}" resolved directly between parties at Stage 1. Project resumes.`);
+      persistMilestone(project, ms); persistProjectDispute(project);
+      persistReputation(proId1, 'professional', 2); persistReputation(cliId1, 'client', 2);
+      render();
+    };
+    const escalateBtn = el('<button class="btn btn-ghost">Escalate — Stage 2 Admin Mediation</button>');
+    escalateBtn.onclick = ()=>{
+      ms.status='dispute2'; ms.disputeStage=2; project.disputeStage=2;
+      log(project, `Stage 1 self-resolution failed on "${ms.name}". Escalated to Stage 2 — Admin Mediation.`);
+      persistMilestone(project, ms); persistProjectDispute(project); render();
+    };
+    actions.appendChild(resolveBtn); actions.appendChild(escalateBtn);
+    wrap.appendChild(actions);
+  }
+
+  // dispute stage 2 - admin mediation (either role can act as "admin" for demo)
+  if(ms.status==='dispute2'){
+    wrap.appendChild(el(`<div class="note-box">Stage 2 — Admin Mediation. Stamped's core team reviews the full record: chat, agreement, all submissions and revision notes. Ruling is final and binding.</div>`));
+    if(myRole==='admin'){
+      const actions = el('<div class="admin-ruling"></div>');
+      const ruleFull = el('<button class="btn btn-stamp">Rule: full payment to consultant</button>');
+      ruleFull.onclick = ()=> adminRule(project, ms, 'full_professional');
+      const ruleSplit = el('<button class="btn btn-ghost">Rule: partial payment (50/50)</button>');
+      ruleSplit.onclick = ()=> adminRule(project, ms, 'partial');
+      const ruleRefund = el('<button class="btn btn-ghost">Rule: full refund to client</button>');
+      ruleRefund.onclick = ()=> adminRule(project, ms, 'full_client');
+      actions.appendChild(ruleFull); actions.appendChild(ruleSplit); actions.appendChild(ruleRefund);
+      wrap.appendChild(actions);
+    } else {
+      wrap.appendChild(el('<div class="timer-note">Waiting for a Stamped admin to review the case and issue a binding ruling.</div>'));
+    }
+  }
+
+  if(ms.status==='resolved'){
+    wrap.appendChild(el(`<div class="note-box seal"><span class="seal-mark">STAMP<br>✓</span><div><b>Dispute resolved.</b> ${escapeHtml(ms.rulingNote||'')}</div></div>`));
+  }
+
+  return wrap;
+}
+
+function releaseMilestonePayment(project, ms, note){
+  ms.status='released'; ms.releasedAt = Date.now();
+  const commission = project.tier==='pro' ? 0.02 : 0.05;
+  const proId = userIdForRole('professional',project), cliId = userIdForRole('client',project);
+  state.users[proId].completedClean = (state.users[proId].completedClean||0)+1;
+  state.users[cliId].completedClean = (state.users[cliId].completedClean||0)+1;
+  bumpScore(proId,'professional', 6); bumpScore(cliId,'client', 4);
+  bumpStats(proId, ms.amount, 0, 0); // turnover — gross contract value, feeds the matching formula
+  log(project, `${note} ${fmtMoney(Math.round(ms.amount*(1-commission)))} released to professional (${(commission*100).toFixed(0)}% commission retained). Reputation updated.`);
+  persistMilestone(project, ms);
+  persistReputation(proId, 'professional', 6, 1, 0, ms.amount, 0, 0);
+  persistReputation(cliId, 'client', 4, 1, 0);
+  render();
+}
+
+function adminRule(project, ms, ruling){
+  const proId = userIdForRole('professional',project), cliId = userIdForRole('client',project);
+  let note='';
+  if(ruling==='full_professional'){
+    note = `Full payment of ${fmtMoney(ms.amount)} awarded to professional.`;
+    bumpScore(cliId,'client',-8); state.users[cliId].disputesLost=(state.users[cliId].disputesLost||0)+1;
+    persistReputation(cliId, 'client', -8, 0, 1);
+  } else if(ruling==='full_client'){
+    note = `Full refund of ${fmtMoney(ms.amount)} returned to client.`;
+    bumpScore(proId,'professional',-8); state.users[proId].disputesLost=(state.users[proId].disputesLost||0)+1;
+    persistReputation(proId, 'professional', -8, 0, 1);
+  } else {
+    note = `Payment split 50/50 between professional and client.`;
+    bumpScore(proId,'professional',-2); bumpScore(cliId,'client',-2);
+    persistReputation(proId, 'professional', -2, 0, 0);
+    persistReputation(cliId, 'client', -2, 0, 0);
+  }
+  ms.status='resolved'; ms.rulingNote=note; ms.disputeStage=0; project.disputeStage=0;
+  log(project, `Admin ruling issued on "${ms.name}": ${note} Ruling is final and binding.`);
+  persistMilestone(project, ms); persistProjectDispute(project);
+  render();
+}
+
+/* ---------- ledger ---------- */
+function renderLedger(project){
+  const wrap = el('<div class="ledger"></div>');
+  [...project.ledger].reverse().forEach(entry=>{
+    wrap.appendChild(el(`<div class="ledger-entry">
+      <div class="ledger-ts">${fmtTs(entry.ts)}</div>
+      <div class="ledger-text">${escapeHtml(entry.text)}</div>
+    </div>`));
+  });
+  return wrap;
+}
+
+/* ---------- modal ---------- */
+function renderModal(){
+  const overlay = el('<div class="modal-overlay"></div>');
+  overlay.onclick = (e)=>{ if(e.target===overlay && modal.type!=='show-user-id' && modal.type!=='matched-confirmation'){ modal=null; render(); } };
+  const m = el('<div class="modal"></div>');
+  overlay.appendChild(m);
+
+  if(modal.type==='show-user-id'){
+    m.innerHTML = modal.created
+      ? `<h3>Account created</h3><p>Share this User ID and the password you set with <b>${escapeHtml(modal.name||'')}</b> directly \u2014 there's no email to send it to.</p>`
+      : `<h3>Welcome to Stamped</h3><p>There's no email/username login here — save this User ID, you'll need it every time you log in.</p>`;
+    m.appendChild(el(`<div style="text-align:center;background:var(--ink);color:var(--parchment-2);border-radius:6px;padding:18px;font-family:var(--mono);font-size:22px;letter-spacing:1px;margin:14px 0;">${escapeHtml(modal.code||'—')}</div>`));
+    const actions = el('<div class="modal-actions"></div>');
+    const ok = el(`<button class="btn btn-stamp">I've saved it — continue</button>`);
+    ok.onclick = ()=>{ modal=null; render(); };
+    actions.appendChild(ok);
+    m.appendChild(actions);
+    return overlay;
+  }
+
+  if(modal.type==='change-password'){
+    m.innerHTML = `<h3>Change Password</h3><p>Enter your current password and a new one.</p>`;
+    const f1 = el(`<div class="field"><label>Current password</label><input id="pw-old" type="password" placeholder="••••••••"/></div>`);
+    const f2 = el(`<div class="field"><label>New password</label><input id="pw-new" type="password" placeholder="At least 6 characters"/></div>`);
+    const f3 = el(`<div class="field"><label>Confirm new password</label><input id="pw-confirm" type="password" placeholder="Repeat new password"/></div>`);
+    const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:9px 12px;font-size:12.5px;margin-bottom:4px;"></div>`);
+    m.appendChild(errBox); m.appendChild(f1); m.appendChild(f2); m.appendChild(f3);
+    const actions = el('<div class="modal-actions"></div>');
+    const cancel = el('<button class="btn btn-ghost">Cancel</button>');
+    cancel.onclick = ()=>{ modal=null; render(); };
+    const save = el('<button class="btn btn-stamp">Update Password</button>');
+    save.onclick = async ()=>{
+      const oldPw = document.getElementById('pw-old').value;
+      const newPw = document.getElementById('pw-new').value;
+      const confirmPw = document.getElementById('pw-confirm').value;
+      const showErr = (msg)=>{ errBox.textContent = msg; errBox.style.display='block'; };
+      if(!oldPw || !newPw || !confirmPw){ showErr('Fill in all three fields.'); return; }
+      if(newPw.length < 6){ showErr('New password must be at least 6 characters.'); return; }
+      if(newPw !== confirmPw){ showErr('New password and confirmation don\u2019t match.'); return; }
+      try{
+        await apiChangePassword(oldPw, newPw);
+        modal=null; render();
+      }catch(e){ showErr(e.message || 'Could not change password.'); }
+    };
+    actions.appendChild(cancel); actions.appendChild(save);
+    m.appendChild(actions);
+    return overlay;
+  }
+
+  if(modal.type==='admin-manage-user'){
+    const tabs = el('<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid #DDD3BC;"></div>');
+    [['create','Create New'],['search','Find & Update']].forEach(([key,label])=>{
+      const t = el(`<div style="flex:1;text-align:center;padding:9px;cursor:pointer;font-size:13px;font-weight:600;color:${modal.mode===key?'var(--stamp)':'var(--text-muted-light)'};border-bottom:2px solid ${modal.mode===key?'var(--stamp)':'transparent'};">${label}</div>`);
+      t.onclick = ()=>{ modal = { type:'admin-manage-user', mode:key, query:'', selectedUserId:null }; render(); };
+      tabs.appendChild(t);
+    });
+    m.appendChild(el(`<h3>Manage Users</h3>`));
+    m.appendChild(tabs);
+
+    const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:9px 12px;font-size:12.5px;margin-bottom:10px;"></div>`);
+    m.appendChild(errBox);
+    const showErr = (msg)=>{ errBox.textContent = msg; errBox.style.display='block'; };
+
+    /* ---------- CREATE NEW ---------- */
+    if(modal.mode==='create'){
+      m.appendChild(el(`<p style="font-size:12.5px;color:var(--text-muted-light);margin:-6px 0 12px;">Set an initial password and share it with them directly — there's no email invite flow.</p>`));
+      const f1 = el(`<div class="field"><label>First name</label><input id="acu-first" placeholder="e.g. ABC"/></div>`);
+      const f2 = el(`<div class="field"><label>Last name</label><input id="acu-last" placeholder="e.g. Sharma"/></div>`);
+      const f3 = el(`<div class="field"><label>Initial password</label><input id="acu-password" type="password" placeholder="At least 6 characters"/></div>`);
+      m.appendChild(f1); m.appendChild(f2); m.appendChild(f3);
+
+      const roleSelect = el(`<select id="acu-role" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)">
+        <option value="client">Client</option>
+        <option value="professional">Consultant</option>
+        <option value="admin">Admin</option>
+      </select>`);
+      const roleField = el(`<div class="field"><label>Role</label></div>`); roleField.appendChild(roleSelect);
+      m.appendChild(roleField);
+
+      const zoneField = el(`<div class="field"><label>Zone</label><input id="acu-zone" placeholder="e.g. Mumbai-3"/></div>`);
+      const regionField = el(`<div class="field"><label>Region</label><input id="acu-region" placeholder="e.g. West"/></div>`);
+      const gradeSelect = el(`<select id="acu-grade" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)">
+        <option value="1">Grade 1 — Zonal support</option>
+        <option value="2">Grade 2 — Regional escalation</option>
+        <option value="3">Grade 3 — Country head</option>
+      </select>`);
+      const gradeField = el(`<div class="field"><label>Admin grade</label></div>`); gradeField.appendChild(gradeSelect);
+      m.appendChild(zoneField); m.appendChild(regionField); m.appendChild(gradeField);
+
+      function syncFields(){
+        const role = roleSelect.value;
+        if(role==='admin'){
+          gradeField.style.display='';
+          const grade = gradeSelect.value;
+          zoneField.style.display = grade==='1' ? '' : 'none';
+          regionField.style.display = grade==='2' ? '' : 'none';
+        } else {
+          gradeField.style.display='none';
+          zoneField.style.display=''; regionField.style.display='';
+        }
+      }
+      roleSelect.onchange = syncFields; gradeSelect.onchange = syncFields; syncFields();
+
+      const actions = el('<div class="modal-actions"></div>');
+      const cancel = el('<button class="btn btn-ghost">Cancel</button>');
+      cancel.onclick = ()=>{ modal=null; render(); };
+      const create = el('<button class="btn btn-stamp">Create Account</button>');
+      create.onclick = async ()=>{
+        const firstName = document.getElementById('acu-first').value.trim();
+        const lastName = document.getElementById('acu-last').value.trim();
+        const password = document.getElementById('acu-password').value;
+        const role = roleSelect.value;
+        const zone = document.getElementById('acu-zone').value.trim();
+        const region = document.getElementById('acu-region').value.trim();
+        const grade = role==='admin' ? Number(gradeSelect.value) : null;
+        if(!firstName || !lastName || !password){ showErr('Fill in name and password.'); return; }
+        if(password.length < 6){ showErr('Password must be at least 6 characters.'); return; }
+        if(role!=='admin' && (!zone||!region)){ showErr('Enter zone and region.'); return; }
+        if(role==='admin' && grade===1 && !zone){ showErr('Grade 1 admins need a zone.'); return; }
+        if(role==='admin' && grade===2 && !region){ showErr('Grade 2 admins need a region.'); return; }
+        try{
+          const result = await apiAdminCreateUser(
+            firstName, lastName, password, role,
+            role==='admin' ? (grade===1?zone:null) : zone,
+            role==='admin' ? (grade===2?region:null) : region,
+            grade
+          );
+          await loadState();
+          modal = { type:'show-user-id', code: result.user_code, created:true, name:`${firstName} ${lastName}` };
+          render();
+        }catch(e){ showErr(e.message || 'Could not create account.'); }
+      };
+      actions.appendChild(cancel); actions.appendChild(create);
+      m.appendChild(actions);
+      return overlay;
+    }
+
+    /* ---------- FIND & UPDATE ---------- */
+    if(!modal.selectedUserId){
+      m.appendChild(el(`<p style="font-size:12.5px;color:var(--text-muted-light);margin:-6px 0 12px;">Search by username (User ID), first name, or last name.</p>`));
+      const searchInput = el(`<input placeholder="e.g. SharmaABC0001, Sharma, or ABC" value="${escapeAttr(modal.query||'')}" style="border:1px solid #DDD3BC;border-radius:4px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:white;width:100%;margin-bottom:10px;"/>`);
+      const resultsBox = el('<div style="max-height:260px;overflow-y:auto;"></div>');
+
+      function userMatchesQuery(u, q){
+        if(!q) return true;
+        const query = q.toLowerCase();
+        const nameParts = u.name.toLowerCase().split(/\s+/);
+        const first = nameParts[0]||'', last = nameParts[nameParts.length-1]||'';
+        return (u.userCode||'').toLowerCase().includes(query) || first.includes(query) || last.includes(query) || u.name.toLowerCase().includes(query);
+      }
+      function renderResults(){
+        resultsBox.innerHTML = '';
+        const candidates = Object.keys(state.users).map(id=>({id, ...state.users[id]})).filter(u=>!u.isSuperuser);
+        const matches = candidates.filter(u=>userMatchesQuery(u, modal.query||''));
+        if(matches.length===0){
+          resultsBox.appendChild(el('<div class="timer-note" style="padding:6px 2px">No matches.</div>'));
+        }
+        matches.slice(0,30).forEach(u=>{
+          const row = el(`<div class="project-item" style="cursor:pointer">
+            <div class="project-item-title">${escapeHtml(u.name)} <span style="font-weight:400;color:var(--text-muted-dark);opacity:.7">· ${roleLabel(u.role)}</span></div>
+            <div class="project-item-meta">${u.userCode||'—'}</div>
+          </div>`);
+          row.onclick = ()=>{ modal.selectedUserId = u.id; render(); };
+          resultsBox.appendChild(row);
+        });
+      }
+      searchInput.oninput = ()=>{ modal.query = searchInput.value; renderResults(); };
+      m.appendChild(searchInput);
+      m.appendChild(resultsBox);
+      renderResults();
+
+      const actions = el('<div class="modal-actions"></div>');
+      const cancel = el('<button class="btn btn-ghost">Cancel</button>');
+      cancel.onclick = ()=>{ modal=null; render(); };
+      actions.appendChild(cancel);
+      m.appendChild(actions);
+      return overlay;
+    }
+
+    /* ---------- EDIT SELECTED USER ---------- */
+    const target = getUser(modal.selectedUserId);
+    const back = el('<div class="dash-link" style="margin-bottom:10px;">&larr; Back to search</div>');
+    back.onclick = ()=>{ modal.selectedUserId = null; render(); };
+    m.appendChild(back);
+    m.appendChild(el(`<p style="font-size:12.5px;color:var(--text-muted-light);margin:-4px 0 12px;">Editing <b>${escapeHtml(target.name)}</b> (${target.userCode||'—'}) — changes apply immediately.</p>`));
+
+    const roleSelect = el(`<select id="aeu-role" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)">
+      <option value="client" ${target.role==='client'?'selected':''}>Client</option>
+      <option value="professional" ${target.role==='professional'?'selected':''}>Consultant</option>
+      <option value="admin" ${target.role==='admin'?'selected':''}>Admin</option>
+    </select>`);
+    const roleField = el(`<div class="field"><label>Role</label></div>`); roleField.appendChild(roleSelect);
+    m.appendChild(roleField);
+
+    const zoneField = el(`<div class="field"><label>Zone</label><input id="aeu-zone" value="${escapeAttr(target.zone||'')}"/></div>`);
+    const regionField = el(`<div class="field"><label>Region</label><input id="aeu-region" value="${escapeAttr(target.region||'')}"/></div>`);
+    const gradeSelect = el(`<select id="aeu-grade" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)">
+      <option value="1" ${target.grade===1?'selected':''}>Grade 1 — Zonal support</option>
+      <option value="2" ${target.grade===2?'selected':''}>Grade 2 — Regional escalation</option>
+      <option value="3" ${target.grade===3?'selected':''}>Grade 3 — Country head</option>
+    </select>`);
+    const gradeField = el(`<div class="field"><label>Admin grade</label></div>`); gradeField.appendChild(gradeSelect);
+    m.appendChild(zoneField); m.appendChild(regionField); m.appendChild(gradeField);
+
+    const tierSelect = el(`<select id="aeu-tier" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)">
+      <option value="free" ${target.tier==='free'?'selected':''}>Free — 5% commission</option>
+      <option value="pro" ${target.tier==='pro'?'selected':''}>Pro — 2% commission</option>
+    </select>`);
+    const tierField = el(`<div class="field"><label>Plan</label></div>`); tierField.appendChild(tierSelect);
+    m.appendChild(tierField);
+
+    function syncFields(){
+      const role = roleSelect.value;
+      if(role==='admin'){
+        gradeField.style.display=''; tierField.style.display='none';
+        const grade = gradeSelect.value;
+        zoneField.style.display = grade==='1' ? '' : 'none';
+        regionField.style.display = grade==='2' ? '' : 'none';
+      } else {
+        gradeField.style.display='none'; tierField.style.display='';
+        zoneField.style.display=''; regionField.style.display='';
+      }
+    }
+    roleSelect.onchange = syncFields; gradeSelect.onchange = syncFields; syncFields();
+
+    const actions = el('<div class="modal-actions"></div>');
+    const cancel = el('<button class="btn btn-ghost">Cancel</button>');
+    cancel.onclick = ()=>{ modal=null; render(); };
+    const save = el('<button class="btn btn-stamp">Save Changes</button>');
+    save.onclick = async ()=>{
+      const role = roleSelect.value;
+      const zone = document.getElementById('aeu-zone').value.trim();
+      const region = document.getElementById('aeu-region').value.trim();
+      const grade = role==='admin' ? Number(gradeSelect.value) : null;
+      const tier = document.getElementById('aeu-tier').value;
+      if(role!=='admin' && (!zone||!region)){ showErr('Enter zone and region.'); return; }
+      if(role==='admin' && grade===1 && !zone){ showErr('Grade 1 admins need a zone.'); return; }
+      if(role==='admin' && grade===2 && !region){ showErr('Grade 2 admins need a region.'); return; }
+      try{
+        await apiAdminUpdateUser(
+          modal.selectedUserId, role,
+          role==='admin' ? (grade===1?zone:null) : zone,
+          role==='admin' ? (grade===2?region:null) : region,
+          grade, role==='admin' ? null : tier
+        );
+        modal = null;
+        await loadState();
+        render();
+      }catch(e){ showErr(e.message || 'Could not save changes.'); }
+    };
+    actions.appendChild(cancel); actions.appendChild(save);
+    m.appendChild(actions);
+    return overlay;
+  }
+
+
+  if(modal.type==='register'){
+    m.innerHTML = `<h3>Register on Stamped</h3><p>Create an account to connect with clients or consultants and start a project.</p>`;
+    const f1 = el(`<div class="field"><label>First name</label><input id="reg-first" placeholder="e.g. ABC"/></div>`);
+    const f1b = el(`<div class="field"><label>Last name</label><input id="reg-last" placeholder="e.g. Sharma"/></div>`);
+    const f2 = el(`<div class="field"><label>I am registering as</label><select id="reg-role" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)">
+      <option value="client" ${modal.role==='client'?'selected':''}>Client — hiring a consultant</option>
+      <option value="professional" ${modal.role==='professional'?'selected':''}>Consultant — offering services</option>
+      <option value="admin" ${modal.role==='admin'?'selected':''}>Admin — platform oversight, sees everything</option>
+    </select></div>`);
+    m.appendChild(f1); m.appendChild(f1b); m.appendChild(f2);
+    const actions = el('<div class="modal-actions"></div>');
+    const cancel = el('<button class="btn btn-ghost">Cancel</button>');
+    cancel.onclick = ()=>{ modal=null; render(); };
+    const create = el('<button class="btn btn-stamp">Register</button>');
+    create.onclick = ()=>{
+      const firstName = document.getElementById('reg-first').value.trim();
+      const lastName = document.getElementById('reg-last').value.trim();
+      const role = document.getElementById('reg-role').value;
+      if(!firstName || !lastName){ alert('Enter a first and last name to register.'); return; }
+      const name = `${firstName} ${lastName}`;
+      const id = uid('user');
+      const newUser = {
+        name, role, initials: initialsForName(name), color: colorForName(name),
+        tier:'free', badges:[], completedClean:0, disputesLost:0
+      };
+      if(role==='professional') newUser.scoreProfessional = 50;
+      else if(role==='client') newUser.scoreClient = 50;
+      state.users[id] = newUser;
+      viewingAs = id;
+      currentProjectId = null;
+      modal = null;
+      if(supabaseConfigured) persist(()=> sbInsert('users', userJsToRow(id, newUser)));
+      render();
+    };
+    actions.appendChild(cancel); actions.appendChild(create);
+    m.appendChild(actions);
+  }
+
+  if(modal.type==='start-project'){
+    const errBox = el(`<div style="display:none;background:#F6DEDE;color:#A32B2B;border-radius:4px;padding:9px 12px;font-size:12.5px;margin-bottom:10px;"></div>`);
+
+    if(modal.step===1){
+      m.appendChild(el(`<h3>Start a new project</h3><p>You'll see your top 3 matched consultants — the first quotation chat is free, the next two have a small unlock fee.</p>`));
+      m.appendChild(errBox);
+      const f1 = el(`<div class="field"><label>Project title</label><input id="sp-title" placeholder="e.g. Homepage redesign" value="${escapeAttr(modal.title)}"/></div>`);
+      m.appendChild(f1);
+
+      const catSelect = el(`<select id="sp-category" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)">
+        <option value="">Select a category…</option>
+        ${ALL_CATEGORIES.map(c=>`<option value="${c}" ${modal.category===c?'selected':''}>${c}</option>`).join('')}
+      </select>`);
+      const catField = el(`<div class="field"><label>Project category</label></div>`); catField.appendChild(catSelect);
+      m.appendChild(catField);
+
+      const subSelect = el(`<select id="sp-subcategory" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)"><option value="">Select a category first…</option></select>`);
+      const subField = el(`<div class="field"><label>Project sub-category</label></div>`); subField.appendChild(subSelect);
+      m.appendChild(subField);
+
+      function syncSubcategories(){
+        const cat = catSelect.value;
+        if(!cat){ subSelect.innerHTML = '<option value="">Select a category first…</option>'; return; }
+        subSelect.innerHTML = '<option value="">Select a sub-category…</option>' +
+          CATEGORY_SUBCATEGORIES[cat].map(s=>`<option value="${s}" ${modal.subcategory===s?'selected':''}>${s}</option>`).join('');
+      }
+      catSelect.onchange = syncSubcategories;
+      syncSubcategories();
+      if(modal.subcategory) subSelect.value = modal.subcategory;
+
+      const actions = el('<div class="modal-actions"></div>');
+      const cancel = el('<button class="btn btn-ghost">Cancel</button>');
+      cancel.onclick = ()=>{ modal=null; render(); };
+      const next = el('<button class="btn btn-stamp">Next</button>');
+      next.onclick = ()=>{
+        const title = document.getElementById('sp-title').value.trim();
+        const category = catSelect.value;
+        const subcategory = subSelect.value;
+        const showErr = (msg)=>{ errBox.textContent = msg; errBox.style.display='block'; };
+        if(!title){ showErr('Enter a project title.'); return; }
+        if(!category || !subcategory){ showErr('Select a category and sub-category.'); return; }
+        modal = { type:'start-project', step:2, title, category, subcategory, description: modal.description||'' };
+        render();
+      };
+      actions.appendChild(cancel); actions.appendChild(next);
+      m.appendChild(actions);
+      return overlay;
+    }
+
+    // step 2 — description
+    m.appendChild(el(`<h3>Describe the project</h3><p>${escapeHtml(modal.title)} · ${escapeHtml(modal.subcategory)}</p>`));
+    m.appendChild(errBox);
+    const descField = el(`<div class="field"><label>Project description</label><textarea id="sp-description" rows="5" placeholder="What does the consultant need to know to get started?" style="border:1px solid #DDD3BC;border-radius:4px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:var(--parchment-2);width:100%;">${escapeHtml(modal.description||'')}</textarea></div>`);
+    m.appendChild(descField);
+
+    const actions = el('<div class="modal-actions"></div>');
+    const back = el('<button class="btn btn-ghost">Back</button>');
+    back.onclick = ()=>{
+      modal.description = document.getElementById('sp-description').value.trim();
+      modal.step = 1; render();
+    };
+    const submit = el(`<button class="btn btn-stamp">Find Consultants</button>`);
+    submit.onclick = async ()=>{
+      const description = document.getElementById('sp-description').value.trim();
+      const showErr = (msg)=>{ errBox.textContent = msg; errBox.style.display='block'; };
+      // Mutate the button directly rather than calling render() here — a full
+      // re-render would rebuild the modal and orphan this handler's own
+      // references to `submit`/`errBox`, so a later error would be written
+      // to elements no longer attached to the page (looks like a permanent hang).
+      submit.disabled = true; submit.textContent = 'Matching…';
+      try{
+        const result = await apiCreateProjectRequest(modal.title, modal.subcategory, description);
+        await loadState();
+        currentRequestId = result.request_id; currentProjectId = null;
+        modal = null;
+        render();
+      }catch(e){
+        submit.disabled = false; submit.textContent = 'Find Consultants';
+        showErr(e.message || 'Could not create request.');
+      }
+    };
+    actions.appendChild(back); actions.appendChild(submit);
+    m.appendChild(actions);
+    return overlay;
+  }
+
+  if(modal.type==='new-project'){
+    const me = getUser(viewingAs);
+    const wantRole = me.role==='professional' ? 'client' : 'professional';
+    let candidates = switchableIds().filter(id => id!==viewingAs && getUser(id).role===wantRole);
+    if(candidates.length===0) candidates = switchableIds().filter(id => id!==viewingAs && getUser(id).role!=='admin'); // fallback: allow any other non-admin account
+
+    m.innerHTML = `<h3>Start a new project</h3><p>You'll connect as ${roleLabel(me.role).toLowerCase()}. All future communication stays inside Stamped.</p>`;
+    if(candidates.length===0){
+      m.innerHTML += `<div class="note-box">No other accounts registered yet. Use the <b>+ Register</b> button in the top bar to create a ${wantRole} account first, then come back here to connect.</div>`;
+      const actions = el('<div class="modal-actions"></div>');
+      const close = el('<button class="btn btn-ghost">Close</button>');
+      close.onclick = ()=>{ modal=null; render(); };
+      actions.appendChild(close);
+      m.appendChild(actions);
+      return overlay;
+    }
+
+    const f1 = el(`<div class="field"><label>Project title</label><input id="np-title" placeholder="e.g. Homepage redesign"/></div>`);
+    const otherSelect = el(`<select id="np-other" style="padding:8px;border-radius:4px;border:1px solid #DDD3BC;background:var(--parchment-2);font-family:var(--sans)"></select>`);
+    candidates.forEach(id=>{
+      const u = getUser(id);
+      otherSelect.appendChild(el(`<option value="${id}">${u.name} · ${roleLabel(u.role)}</option>`));
+    });
+    const f2 = el(`<div class="field"><label>Connect with</label></div>`);
+    f2.appendChild(otherSelect);
+    m.appendChild(f1); m.appendChild(f2);
+    const actions = el('<div class="modal-actions"></div>');
+    const cancel = el('<button class="btn btn-ghost">Cancel</button>');
+    cancel.onclick = ()=>{ modal=null; render(); };
+    const create = el('<button class="btn btn-stamp">Connect</button>');
+    create.onclick = ()=>{
+      const title = document.getElementById('np-title').value.trim() || 'Untitled Project';
+      const tier = 'free';
+      const otherId = document.getElementById('np-other').value;
+      const clientId = me.role==='professional' ? otherId : viewingAs;
+      const clientUser = getUser(clientId);
+      const initialEntry = { id: uid('ledger'), ts:Date.now(), text:`Project created and connected on Stamped.` };
+      const proj = {
+        id: uid('proj'), title, tier,
+        professional: me.role==='professional' ? viewingAs : otherId,
+        client: clientId,
+        createdAt: Date.now(), messages:[], milestones:[], ledger:[initialEntry], disputeStage:0,
+        zone: clientUser.zone||null, region: clientUser.region||null
+      };
+      state.projects.push(proj);
+      currentProjectId = proj.id; currentTab='chat';
+      modal=null;
+      if(supabaseConfigured) persist(async ()=>{
+        await sbInsert('projects', projectJsToRow(proj));
+        await sbInsert('ledger_entries', ledgerJsToRow(proj.id, initialEntry));
+      });
+      render();
+    };
+    actions.appendChild(cancel); actions.appendChild(create);
+    m.appendChild(actions);
+  }
+  return overlay;
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeAttr(s){ return escapeHtml(s); }
+
+/* ============================= INIT ============================= */
+(async function init(){
+  if(supabaseConfigured){
+    loadSessionFromStorage();
+    if(session){
+      const validUserId = await apiValidateSession();
+      if(!validUserId){
+        // Token expired or was revoked — don't pretend we're still logged in.
+        session = null; saveSessionToStorage();
+      } else {
+        viewingAs = session.userId;
+      }
+    }
+  }
+  await loadState();
+  currentProjectId = state.projects[0]?.id || null;
+  render();
+})();
+</script>
+</body>
+</html>
