@@ -3046,7 +3046,10 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<
 function escapeAttr(s){ return escapeHtml(s); }
 
 /* ============================= INIT ============================= */
+const STAMPED_BUILD = 'vibrant-modern-ui-2026-07-22';
+
 (async function init(){
+  console.log('Stamped build:', STAMPED_BUILD);
   if(supabaseConfigured){
     loadSessionFromStorage();
     if(session){
